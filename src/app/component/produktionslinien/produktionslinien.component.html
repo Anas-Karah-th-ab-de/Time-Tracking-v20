@@ -1,0 +1,58 @@
+<!-- in Ihrer Komponenten-Template-Datei -->
+<div class="input-container">
+<input type="text" #inputField [(ngModel)]="inputValue" (input)="handleInputChange(inputValue)">
+
+<div *ngIf="feedbackMessage">{{ feedbackMessage }}</div>
+
+</div>
+
+
+
+
+<div class="container">
+
+<div class="projekt-daten">
+    <h3>Projektdaten:</h3>
+      <p><span class="label">Produktionslinie:</span><span class="value">{{ produktionslinienDaten }}</span></p>
+      <p><span class="label">PP-Auftrag-Nr.:</span><span class="value">{{ PpArfrag }}</span></p>
+      <p><span class="label">Produkt:</span><span class="value">{{ Bezeichnung }}</span></p>
+      <p><span class="label">Menge:</span><span class="value">{{ sollmenge }}</span></p>
+      
+     
+      
+        
+      <p><span class="label">Startzeit:</span><span class="value">{{ projektStartzeit | date: 'medium' }}</span></p>
+      <p><span class="label">Aktiv seit:</span><span class="value">{{ aktivSeit }}</span></p>
+    </div>
+
+  
+  
+    <div class="mitarbeiter-liste">
+      <h4>Aktive Mitarbeiter:</h4>
+      <ul>
+        <li *ngFor="let mitarbeiter of aktiveMitarbeiter">
+          <span class="status-punkt" [ngClass]="{
+            'status-gruen': mitarbeiter.status === 'Produktionszeit' || mitarbeiter.status === 'Rüstzeit' ,
+            'status-gelb': mitarbeiter.status === 'Wartezeit',
+            'status-rot': mitarbeiter.status === 'abgemeldet'
+          }">•</span>
+          {{ mitarbeiter.name }} - {{ mitarbeiter.status }}
+      
+
+        </li>
+      </ul>
+    </div>
+    
+<!-- produktionslinien.component.html -->
+
+<div class="button-container">
+  <button (click)="oeffneDialogUndWechselStatus()"
+          [ngClass]="{'produktionszeit-button': istProduktionszeit, 'wartezeit-button': !istProduktionszeit}">
+    {{ istProduktionszeit ? 'Wechseln auf Wartezeit' : 'Wechseln auf Produktionszeit' }}
+  </button>
+</div>
+
+<!-- Rest des Templates -->
+</div>
+
+

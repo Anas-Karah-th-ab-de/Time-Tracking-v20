@@ -1,0 +1,172 @@
+/* Grundlegende Styling-Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  position: relative; /* Positionierungskontext für den absolut positionierten Button */
+}
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Zentrieren des Eingabefelds und Styling der Feedback-Nachricht */
+.input-container {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.input-container input[type="text"] {
+  width: 60%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.input-container input[type="text"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+}
+
+.feedback-message {
+  color: #d9534f;
+  margin-bottom: 20px;
+}
+
+/* Styling für Projektdaten und Mitarbeiterliste */
+.projekt-daten, .mitarbeiter-liste {
+  margin: 20px auto;
+  width: 70%;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.projekt-daten h3, .mitarbeiter-liste h4 {
+  color: #007bff;
+  margin-bottom: 15px;
+}
+
+.label {
+  font-weight: bold;
+  color: #555;
+  margin-right: 10px;
+}
+
+.value {
+  font-style: normal;
+  color: #666;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+ .status-gruen {
+  color: #28a745; /* Ein kräftigeres Grün */
+}
+
+.status-gelb {
+  color: #ffc107; /* Ein leuchtenderes Gelb */
+}
+
+ .status-rot {
+  color: #dc3545; /* Ein intensiveres Rot */
+}
+
+.status-punkt {
+  font-size: 35px; /* Größe des Punktes */
+  margin-right: 5px; /* Abstand zwischen Punkt und Text */
+  vertical-align: middle; /* Vertikale Ausrichtung mit dem Text */
+
+ 
+}
+
+/* Stil für die Liste der Mitarbeiter */
+ul li {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.3s ease;
+  display: flex; /* Flexbox-Layout für die horizontale Anordnung */
+  align-items: center; /* Vertikale Ausrichtung der Elemente */
+}
+
+ul li:hover {
+  background-color: #f8f8f8;
+}
+
+/* Stil für die Mitarbeiter-Namen */
+.mitarbeiter-name {
+  font-weight: normal; /* Optional: Schriftstärke anpassen */
+  font-size: 16px; /* Schriftgröße für bessere Lesbarkeit */
+}
+
+/* produktionslinien.component.css */
+
+
+
+li.projektleiter {
+  background-color: #f0f0f0; /* Hellgrau für Projektleiter */
+}
+
+li.normaler-mitarbeiter {
+  background-color: #fff; /* Weiß für normale Mitarbeiter */
+}
+/* produktionslinien.component.css */
+
+
+/* produktionslinien.component.css */
+/* produktionslinien.component.css */
+
+.button-container {
+  position: absolute;
+  top: 300px; /* Abstand von oben */
+  right: 90px; /* Abstand von rechts */
+}
+
+button {
+  padding: 30px 30px;
+  font-size: 18px; /* Größere Schriftgröße */
+  font-weight: bold; /* Fettgedruckter Text */
+  border-radius: 5px; /* Leicht abgerundete Ecken */
+  cursor: pointer;
+  border: none; /* Entfernen des standardmäßigen Randstils */
+  background-color: #007bff; /* Grundfarbe */
+  color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Schatten für Tiefe */
+  transition: all 0.3s ease; /* Weiche Übergänge für Hover-Effekte */
+}
+
+button:hover {
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Größerer Schatten beim Hover */
+  transform: translateY(-2px); /* Leichte Verschiebung nach oben beim Hover */
+}
+
+.produktionszeit-button {
+  background-color: #dc3545; /* Rotton für Wartezeit */
+}
+
+.wartezeit-button {
+  
+  background-color: #28a745; /* Grünton für Produktionszeit */
+}
+
+
+
+/* Anpassungen für die Projekt-Daten und Mitarbeiter-Liste */
+
+/* Rest des CSS unverändert... */
+
+
+
+/* Weitere vorhandene Stile... */

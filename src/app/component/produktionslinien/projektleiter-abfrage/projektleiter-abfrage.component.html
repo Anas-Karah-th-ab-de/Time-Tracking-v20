@@ -1,0 +1,4 @@
+<!-- produktionslinien.component.html -->
+<!-- Verstecktes Eingabefeld für QR-Code-Scanning -->
+<h2>Projektleiter?</h2>
+<input type="text" #qrCodeInput [(ngModel)]="qrCode" (input)="handleQrCodeScan()" >

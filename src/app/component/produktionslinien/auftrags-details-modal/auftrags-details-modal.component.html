@@ -1,0 +1,11 @@
+<!-- auftrags-details-modal.component.html -->
+<h2 mat-dialog-title>Chargenwechsel / Auftragswechsel?</h2>
+<mat-dialog-content>
+  <p>Auftragsnummer: {{ data.auftragsnr }}</p>
+  <p>FP-Bezeichnung: {{ data.fpbezeichnung }}</p>
+  <p>Sollmenge: {{ data.sollmenge }}</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="true">Ja</button>
+  <button mat-button [mat-dialog-close]="false">Nein</button>
+</mat-dialog-actions>
