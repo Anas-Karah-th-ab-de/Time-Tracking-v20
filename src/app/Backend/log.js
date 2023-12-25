@@ -27,6 +27,7 @@ mongoose.connect('mongodb://localhost:27017/time-tracking')
   app.post('/login', async (req, res) => {
     try {
         const { username } = req.body;
+        console.log(username)
         const user = await User.findOne({ username });
 
         if (user) {
@@ -152,46 +153,38 @@ app.post('/data', async (req, res) => {
 });
 
 const Auftrag = auftragDbConnection.model('Auftrag', AuftragSchema);
-  app.get('/check-aktiver-auftrag', async (req, res) => {
-    try {
-      const produktionslinie = req.query.produktionslinie;
-      console.log(req.query);
-  
-      if (!produktionslinie) {
-        return res.status(400).send('Produktionslinie ist erforderlich');
-      }
-  
-      const aktiverAuftrag = await Projekt.findOne({ produktionslinie, aktiv: true });
-      let auftragsnummer = req.query.Auftrag; // Verwenden Sie req.query.Auftrag
-      console.log(auftragsnummer);
-  
-      if (aktiverAuftrag) {
-        auftragsnummer = auftragsnummer.replace('Pr.', '');
-        const auftragsNummerInt = parseInt(auftragsnummer, 10);
-        const auftragsDetails = await Auftrag.findOne({ auftragsnr: auftragsNummerInt });
-  
-        if (auftragsDetails) {
-          const response = {
-            existiertAktiverAuftrag: true,
-            auftragsDetails: {
-              auftragsnr: auftragsDetails.auftragsnr,
-              fpbezeichnung: auftragsDetails.fpbezeichnung,
-              sollmenge: auftragsDetails.sollmenge
-            }
-          };
-          console.log(response)
-          res.json(response);
-        } else {
-          res.status(404).send('Details zum aktiven Auftrag nicht gefunden');
-        }
-      } else {
-        res.json({ existiertAktiverAuftrag: false });
-      }
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Serverfehler');
+app.get('/check-aktiver-auftrag', async (req, res) => {
+  try {
+    const produktionslinie = req.query.produktionslinie;
+    const auftragsnummer = req.query.Auftrag.replace('Pr.', '').trim();
+
+    if (!produktionslinie) {
+      return res.status(400).send('Produktionslinie ist erforderlich');
     }
-  });
+
+    // Überprüfen, ob es ein aktives Projekt in der Produktionslinie gibt
+    const aktivesProjekt = await Projekt.findOne({ produktionslinie, aktiv: true });
+
+    if (aktivesProjekt && aktivesProjekt.Auftrag) {
+      // Ein aktives Projekt existiert und hat einen Eintrag im Feld "Auftrag"
+      const auftragsDetails = await Auftrag.findOne({ auftragsnr: auftragsnummer });
+      res.json({
+        existiertAktiverAuftrag: true,
+        auftragsDetails: {
+          auftragsnr: auftragsDetails.auftragsnr,
+          fpbezeichnung: auftragsDetails.fpbezeichnung,
+          sollmenge: auftragsDetails.sollmenge
+        }
+      });
+    } else {
+      // Kein aktives Projekt oder kein Eintrag im Feld "Auftrag"
+      res.json({ existiertAktiverAuftrag: false });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Serverfehler');
+  }
+});
 
 
   app.get('/auftrag-details/:auftragsnummer', async (req, res) => {
@@ -211,7 +204,7 @@ const Auftrag = auftragDbConnection.model('Auftrag', AuftragSchema);
             sollmenge: auftragsDetails.sollmenge
           }
         };
-        console.log(response);
+       // console.log(response);
         res.json(response);
       } else {
         res.status(404).send('Auftragsdetails nicht gefunden');
@@ -232,13 +225,15 @@ const Auftrag = auftragDbConnection.model('Auftrag', AuftragSchema);
         if (!aktivesProjekt) {
             return res.status(404).send('Kein aktives Projekt gefunden.');
         }
-
+    //console.log(aktivesProjekt)
         res.json(aktivesProjekt);
     } catch (err) {
         console.error(err);
         res.status(500).send('Serverfehler');
     }
 });
+
+
 app.put('/aktualisiereStatus/:produktionslinie', async (req, res) => {
   try {
     const produktionslinie = req.params.produktionslinie;
@@ -248,14 +243,37 @@ app.put('/aktualisiereStatus/:produktionslinie', async (req, res) => {
       return res.status(400).send({ message: 'Produktionslinie, Mitarbeitername und neue Aktivität sind erforderlich' });
     }
 
-    await wechselAktivitaet(produktionslinie, mitarbeiterName, neueAktivitaet);
+    const projekt = await Projekt.findOne({ produktionslinie, aktiv: true });
 
-    res.status(200).send({ message: 'Mitarbeiterstatus erfolgreich aktualisiert' });
+    if (!projekt) {
+      return res.status(404).send({ message: 'Projekt nicht gefunden' });
+    }
+
+    const mitarbeiter = projekt.mitarbeiter.find(m => m.name === mitarbeiterName);
+
+    if (!mitarbeiter) {
+      return res.status(400).send({ message: 'Mitarbeiter nicht gefunden' });
+    }
+
+    // Überprüfen aller Aktivitäten auf offene Einträge
+    const hatOffeneEinträge = ['Produktionszeit', 'Ruestzeit', 'Wartezeit'].some(aktivitaet => 
+      Array.isArray(mitarbeiter[aktivitaet]) && mitarbeiter[aktivitaet].some(s => s.ende === null)
+    );
+
+    if (hatOffeneEinträge) {
+      // Aktualisieren des Status, wenn ein offener Eintrag vorhanden ist
+      await wechselAktivitaet(produktionslinie, mitarbeiterName, neueAktivitaet);
+      res.status(200).send({ message: 'Mitarbeiterstatus erfolgreich aktualisiert' });
+    } else {
+      res.status(200).send({ message: 'Keine offenen Einträge vorhanden, keine Aktualisierung durchgeführt' });
+    }
+
   } catch (error) {
     console.error('Fehler beim Aktualisieren des Mitarbeiterstatus:', error);
     res.status(500).send({ message: 'Interner Serverfehler' });
   }
 });
+
 
 const abmeldeMitarbeiterVonAllenProjekten = async (mitarbeiterName) => {
   try {
@@ -300,7 +318,24 @@ const abmeldeMitarbeiterVonAllenProjekten = async (mitarbeiterName) => {
     throw error;
   }
 };
+app.post('/api/abmeldung', async (req, res) => {
+  try {
+    // Nehmen wir an, der QR-Code enthält direkt den Namen des Mitarbeiters
+    const mitarbeiterName = req.body.mitarbeiterName; // Oder extrahieren Sie den Namen anders aus dem QR-Code
+console.log(mitarbeiterName);
+console.log(req.body);
+    await abmeldeMitarbeiterVonAllenProjekten(mitarbeiterName);
 
+    // Antwort senden
+    res.status(200).json({
+      mitarbeiterName: mitarbeiterName,
+      abmeldezeit: new Date() // Die aktuelle Zeit als Abmeldezeit
+    });
+  } catch (error) {
+    console.error('Fehler bei der Abmeldung:', error);
+    res.status(500).send('Interner Serverfehler');
+  }
+});
 async function wechselAktivitaet(produktionslinie, mitarbeiterName, neueAktivitaet) {
   console.log(mitarbeiterName,neueAktivitaet)
   try {
@@ -416,110 +451,21 @@ app.post('/checkMitarbeiter/:produktionslinie', async (req, res) => {
   }
 });
 
-
-/*
-async function wechselAktivitaet(produktionslinie, mitarbeiterName, neueAktivitaet) {
+//Projekt leiter
+app.get('/projekte/nichtAktiv', async (req, res) => {
   try {
-  const projekt = await Projekt.findOne({ produktionslinie: produktionslinie, aktiv: true });
-  if (!projekt) {
-    console.log('Projekt nicht gefunden');
-    return;
-  }
+    const Projekts = await Projekt.find({ aktiv: false });
 
-  const mitarbeiter = projekt.mitarbeiter.find(m => m.name === mitarbeiterName);
-  await abmeldeMitarbeiterVonAllenProjekten(mitarbeiterName);
-  if (!mitarbeiter) {
-    console.log('Mitarbeiter nicht gefunden');
-    return;
-  }
-
-  const jetzt = new Date();
-  let letzteAktivitaet = mitarbeiter.letzteAktivitaet;
-
-  // Schließen des letzten offenen Intervalls der aktuellen Aktivität
-  if (mitarbeiter[letzteAktivitaet] && mitarbeiter[letzteAktivitaet].length > 0) {
-    let letztesOffenesIntervall = mitarbeiter[letzteAktivitaet].find(intervall => intervall.ende === null);
-    if (letztesOffenesIntervall) {
-      letztesOffenesIntervall.ende = jetzt;
+    if (Projekts.length === 0) {
+        return res.status(404).send('Kein Projekt gefunden.');
     }
+
+    res.json(Projekts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Serverfehler');
   }
-
-  // Logik zur Bestimmung der neuen Aktivität
-  if (letzteAktivitaet !== neueAktivitaet) {
-    let neuesIntervall = {
-      nummer: mitarbeiter[neueAktivitaet]?.length + 1 || 1,
-      start: jetzt,
-      ende: null
-    };
-    mitarbeiter[neueAktivitaet] = mitarbeiter[neueAktivitaet] || [];
-    mitarbeiter[neueAktivitaet].push(neuesIntervall);
-    mitarbeiter.letzteAktivitaet = neueAktivitaet;
-  } else {
-    // Hier könnte Logik hinzugefügt werden, um die neueAktivitaet zu ändern, 
-    // wenn letzteAktivitaet bereits neueAktivitaet ist
-  }
-  try {
-    await projekt.save();
-  } catch (error) {
-    if (error instanceof mongoose.Error.VersionError) {
-      // Projekt neu laden und erneut versuchen
-      const frischesProjekt = await Projekt.findOne({ produktionslinie: produktionslinie, aktiv: true });
-      // Übertragen Sie die Änderungen auf frischesProjekt
-      // ...
-      await frischesProjekt.save();
-    } else {
-      throw error;
-    }
-  }
-} catch (error) {
-  throw error; // Oder behandeln Sie den Fehler entsprechend
-}
-
-
-
-
-const abmeldeMitarbeiterVonAllenProjekten = async (mitarbeiterName, status) => {
-  const aktiveProjekte = await Projekt.find({ aktiv: true });
-  for (let projekt of aktiveProjekte) {
-    if (projekt.mitarbeiter) {
-      const mitarbeiterIndex = projekt.mitarbeiter.findIndex(m => m.name === mitarbeiterName);
-      if (mitarbeiterIndex !== -1) {
-        const mitarbeiter = projekt.mitarbeiter[mitarbeiterIndex];
-        
-        mitarbeiter.Produktionszeit = mitarbeiter.Produktionszeit || [];
-        mitarbeiter.Ruestzeit = mitarbeiter.Ruestzeit || [];
-        mitarbeiter.Wartezeit = mitarbeiter.Wartezeit || [];
-
-        const aktuellesDatum = new Date();
-        let letztesIntervall;
-
-        switch (status) {
-          case 'Produktionszeit':
-            letztesIntervall = mitarbeiter.Produktionszeit.pop() || null;
-            break;
-          case 'Ruestzeit':
-            letztesIntervall = mitarbeiter.Ruestzeit.pop() || null;
-            break;
-          case 'Wartezeit':
-            letztesIntervall = mitarbeiter.Wartezeit.pop() || null;
-            break;
-          default:
-            // Behandlung anderer Fälle oder Fehlermeldung
-            break;
-        }
-
-        if (letztesIntervall && !letztesIntervall.ende) {
-          letztesIntervall.ende = aktuellesDatum;
-          mitarbeiter[status].push(letztesIntervall);
-        }
-
-        await projekt.save();
-      }
-    }
-  }
-};
-}
-*/
+});
 
 app.listen(3002, () => {
     console.log('Server läuft auf http://localhost:3002');

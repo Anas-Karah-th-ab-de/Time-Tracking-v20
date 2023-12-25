@@ -162,7 +162,36 @@ button:hover {
 }
 
 
+.datetime-container {
+  position: fixed;       /* Fixiert die Position unabhängig vom Scrollen */
+  top: 15px;             /* Abstand von der oberen Fensterkante */
+  right: 15px;           /* Abstand von der rechten Fensterkante */
+  z-index: 1000;         /* Stellt sicher, dass der Container über anderen Elementen angezeigt wird */
+  
+  background-color: rgba(0, 0, 0, 0.7);  /* Dunkler, leicht transparenter Hintergrund */
+  color: #FFFFFF;        /* Weißer Text für Kontrast */
+  
+  padding: 8px 12px;     /* Innenabstand um den Text */
+  border-radius: 8px;    /* Abgerundete Ecken */
+  
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ein leichter Schatten für Tiefe */
 
+  font-family: 'Arial', sans-serif; /* Ein allgemeines, sauberes Schriftbild */
+  font-size: 0.9em;      /* Eine moderate Schriftgröße */
+}
+
+.datetime-container span {
+  margin-right: 10px;    /* Ein wenig Abstand zwischen den Span-Elementen */
+}
+.datetime-container {
+  display: flex;
+  align-items: center;
+}
+
+.datetime-container mat-icon {
+  margin-left: 10px;
+  cursor: pointer;
+}
 /* Anpassungen für die Projekt-Daten und Mitarbeiter-Liste */
 
 /* Rest des CSS unverändert... */

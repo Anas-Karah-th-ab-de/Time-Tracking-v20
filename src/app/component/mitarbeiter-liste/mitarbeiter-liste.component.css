@@ -1,0 +1,10 @@
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  
+  .search-input {
+    width: 300px; /* oder eine andere geeignete Breite */
+  }
+  

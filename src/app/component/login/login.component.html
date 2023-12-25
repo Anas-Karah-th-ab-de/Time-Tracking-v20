@@ -1,5 +1,6 @@
 <!-- login.component.html -->
 <form (submit)="login()">
+    <label>Bitte scannen Sie den QR-Code</label>
     <input type="text" [(ngModel)]="userInput" (ngModelChange)="onUserInputChanged($event)" [ngModelOptions]="{standalone: true}">
 
     <button type="submit" hidden>Login</button>

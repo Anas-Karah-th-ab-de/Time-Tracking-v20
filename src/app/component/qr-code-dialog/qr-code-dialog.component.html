@@ -1,0 +1,14 @@
+<mat-dialog-content>
+    <div class="qr-code-container">
+      <img *ngIf="qrCodeDataURL" [src]="qrCodeDataURL" alt="QR Code" class="qr-code">
+      <div class="qr-code-info">
+        <h2>{{ name }}</h2>
+        <p *ngIf="isProjektleiter">Projektleiter</p>
+      </div>
+    </div>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions>
+    <button mat-button (click)="print()">Drucken</button>
+  </mat-dialog-actions>
+  

@@ -1,0 +1,32 @@
+/* Stil für den Container */
+.mitarbeiter-erstellen-container {
+    /* Füge hier deine gewünschten Stile hinzu */
+    max-width: 400px; /* Beispiel: Maximale Breite des Containers */
+    margin: 0 auto; /* Beispiel: Zentrierung des Containers horizontal */
+    padding: 20px; /* Beispiel: Innenabstand von 20 Pixeln */
+    border: 1px solid #ccc; /* Beispiel: Eine 1-Pixel-Grenze mit grauer Farbe */
+    background-color: #f0f0f0; /* Beispiel: Hintergrundfarbe grau */
+  }
+  
+  /* Stil für die Vollbreiten-Eingabefelder */
+  .full-width-input {
+    /* Füge hier deine gewünschten Stile hinzu */
+    width: 100%; /* Beispiel: Vollbreite */
+    margin-bottom: 20px; /* Beispiel: Abstand zwischen den Eingabefeldern */
+  }
+  
+  /* Stil für den Submit-Button */
+  button[type="submit"] {
+    /* Füge hier deine gewünschten Stile hinzu */
+    width: 100%; /* Beispiel: Vollbreite */
+    background-color: #007bff; /* Beispiel: Hintergrundfarbe blau */
+    color: #fff; /* Beispiel: Textfarbe weiß */
+    border: none; /* Beispiel: Keine Grenze */
+    padding: 10px 20px; /* Beispiel: Innenabstand von 10 Pixeln oben/unten und 20 Pixeln links/rechts */
+  }
+  
+  /* Hinzufügen von Hover-Effekten für den Submit-Button */
+  button[type="submit"]:hover {
+    background-color: #0056b3; /* Beispiel: Hintergrundfarbe bei Hover-Effekt */
+  }
+  

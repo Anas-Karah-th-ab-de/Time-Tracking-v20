@@ -1,0 +1,56 @@
+/* Stil für das <mat-dialog-content> Element */
+mat-dialog-content {
+    /* Füge hier deine gewünschten Stile hinzu */
+    padding: 20px; /* Beispiel: Innenabstand von 20 Pixeln */
+  }
+  
+  /* Stil für das <div #qrCodeContainer> Element innerhalb von <mat-dialog-content> */
+  mat-dialog-content div#qrCodeContainer {
+    /* Füge hier deine gewünschten Stile hinzu */
+    background-color: #f0f0f0; /* Beispiel: Hintergrundfarbe grau */
+    border: 1px solid #ccc; /* Beispiel: Eine 1-Pixel-Grenze mit grauer Farbe */
+    padding: 10px; /* Beispiel: Innenabstand von 10 Pixeln */
+  }
+  
+  /* Stil für das <button mat-button> Element innerhalb von <mat-dialog-actions> */
+  mat-dialog-actions button.mat-button {
+    /* Füge hier deine gewünschten Stile hinzu */
+    background-color: #007bff; /* Beispiel: Hintergrundfarbe blau */
+    color: #fff; /* Beispiel: Textfarbe weiß */
+    border: none; /* Beispiel: Keine Grenze */
+    padding: 10px 20px; /* Beispiel: Innenabstand von 10 Pixeln oben/unten und 20 Pixeln links/rechts */
+  }
+  
+  /* Hinzufügen von Hover-Effekten für den Button */
+  mat-dialog-actions button.mat-button:hover {
+    background-color: #0056b3; /* Beispiel: Hintergrundfarbe bei Hover-Effekt */
+  }
+  .qr-code-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .qr-code {
+    margin-right: 20px; /* Abstand zwischen QR-Code und Informationen */
+  }
+  
+  .qr-code-info {
+    text-align: left;
+  }
+  
+  
+  /* Stile für den Druck */
+/* Stile für den Druck */
+@media print {
+  /* Fügen Sie hier nur die Stile ein, die für das Drucken benötigt werden */
+  /* Beispiel: */
+  .qr-code-container {
+    flex-direction: row; /* Ändern Sie es zurück zu row, wenn Sie das gleiche Layout wie auf dem Bildschirm wollen */
+  }
+}
+
+  
+  
+  
+  

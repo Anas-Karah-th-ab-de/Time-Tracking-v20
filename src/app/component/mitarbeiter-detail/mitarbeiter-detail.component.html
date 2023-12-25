@@ -1,0 +1,34 @@
+<!-- bearbeiten-mitarbeiter.component.html -->
+
+<div class="navigation-buttons">
+  <button (click)="navigateTo('/mitarbeiter-liste')">Mitarbeiter Liste</button>
+  <button (click)="navigateTo('/mitarbeiter-detail')">Mitarbeiter hinzufügen</button>
+  <button (click)="navigateTo('/projektleiter')">Auftrag Liste</button>
+  <button (click)="navigateTo('/login')">Abmelden</button>
+</div>
+
+
+<div class="mitarbeiter-erstellen-container">
+    <form #bearbeitenForm="ngForm" (ngSubmit)="speichern(bearbeitenForm)">
+        <mat-form-field class="full-width-input">
+          <mat-label>Name</mat-label>
+          <input matInput [(ngModel)]="bearbeitenderMitarbeiter.name" name="name" required>
+    
+        </mat-form-field>
+      
+        <mat-form-field class="full-width-input">
+          <mat-label>Mitarbeiter Nummer</mat-label>
+          <input matInput [(ngModel)]="bearbeitenderMitarbeiter.MitarbeiterNummer" name="MitarbeiterNummer" required>
+        </mat-form-field>
+        
+        <div>
+          <mat-label>Projektleiter</mat-label>
+          <mat-radio-group [(ngModel)]="bearbeitenderMitarbeiter.projektleiter" name="projektleiter">
+            <mat-radio-button value="ja">Ja</mat-radio-button>
+            <mat-radio-button value="nein">Nein</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      
+        <button type="submit" mat-raised-button color="primary">Speichern</button>
+      </form>
+    </div>

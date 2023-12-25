@@ -45,12 +45,21 @@ export class LoginComponent {
       // Extrahieren Sie den Teil nach 'PL.' und navigieren Sie zu dieser Route
       const produktionslinie = username.split('PL.')[1];
       this.router.navigate(['/produktionslinien', produktionslinie]);
+      this.userInput = '';
     } else if (username.includes('Projektleiter: ja')) {
+      const qrCodeTeile = username.split(', ');
+  
+      // Erwarten des Formats "Name: [Name]" für den ersten Teil
+      const nameTeil = qrCodeTeile[0].split(': ');
+      const mitarbeiterName = nameTeil[1].trim();
+      this.dataSharingService.setProjektleiter(mitarbeiterName);
       // Weiterleitung zur Projektleiter-Seite
-      this.router.navigate(['/projektleiter']);
+      this.router.navigate(['/projektleiter',mitarbeiterName]);
+      this.userInput = '';
     } else {
       // Weiterleitung zu einer Standardseite oder einer Fehlerseite
       this.router.navigate(['/standardseite']);
+      this.userInput = '';
     }
   }
   

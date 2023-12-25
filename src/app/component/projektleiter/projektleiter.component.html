@@ -1,0 +1,54 @@
+
+
+
+
+
+
+
+
+
+<div class="navigation-buttons">
+  <button (click)="navigateTo('/mitarbeiter-liste')">Mitarbeiter Liste</button>
+  <button (click)="navigateTo('/mitarbeiter-detail')">Mitarbeiter hinzufügen</button>
+  <button (click)="navigateTo('/projektleiter')">Auftrag Liste</button>
+  <button (click)="navigateTo('/login')">Abmelden</button>
+</div>
+
+
+
+<div>
+  <h1>Nicht aktive Projekte</h1>
+  <div class="filter-container">
+    <input type="text" [(ngModel)]="filterText" (ngModelChange)="applyFilter()" 
+           placeholder="Filtern nach Auftrag, Produktionslinie">
+    <input type="text" [(ngModel)]="mitarbeiterFilter" (ngModelChange)="applyFilter()" 
+           placeholder="Filtern nach Mitarbeitername">
+    <input type="date" [(ngModel)]="aktuellesDatum" (ngModelChange)="applyFilter()">
+  </div>
+  
+
+  <ul>
+    <li *ngFor="let projekt of gefilterteProjekte" (click)="onSelectProjekt(projekt)">
+      
+      <div>Autrag: {{ projekt.Auftrag }}</div>
+      <div>Produktionslinie: {{ projekt.produktionslinie }}</div>
+      <div>Startzeit: {{ projekt.startzeit | date:'dd.MM.yyyy HH:mm:ss' }}</div>
+      <div>Endzeit: {{ projekt.endzeit | date:'dd.MM.yyyy HH:mm:ss' }}</div>
+    </li>
+  </ul>
+
+  <div *ngIf="ausgewaehltesProjekt">
+    <h3>Projektdetails: {{ ausgewaehltesProjekt.Auftrag }}</h3>
+    <div>
+      <h4>Mitarbeiter</h4>
+      <ul>
+        <li *ngFor="let mitarbeiter of ausgewaehltesProjekt.mitarbeiter">
+          Name: {{ mitarbeiter.name }}
+          
+          <!-- Weitere Mitarbeiterdetails mit Date Pipe formatieren -->
+        </li>
+      </ul>
+    </div>
+    <button (click)="onBearbeiten()">Bearbeiten</button>
+  </div>
+</div>

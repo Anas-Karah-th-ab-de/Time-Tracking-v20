@@ -1,0 +1,100 @@
+/* personalschleuse.component.css */
+.personalschleuse {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+  padding-top: 30px; /* 300px nach oben verschieben */
+}
+
+
+.personalschleuse p {
+  margin: 10px 0;
+  color: #333;
+  font-size: 1.2em;
+}
+
+/* Stil für die Anzeige der Abmeldung */
+.abmeldung-display {
+  padding: 40px; /* Größerer Innenabstand */
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 50%; /* Größere Breite */
+  margin-top: 20px; /* Abstand nach oben */
+  font-size: 1.5em; /* Größere Schriftgröße */
+}
+
+/* Stil für den Header und das Logo */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 260px; /* Passen Sie die Größe nach Bedarf an */
+  height: auto;
+}
+
+.header p {
+  font-size: 1.5em;
+  color: #007bff;
+}
+
+
+.personalschleuse.qrCodeInput {
+  opacity: 0;
+  position: absolute;
+  left: -9999px;
+}
+
+.live-zeit {
+  font-size: 2em; /* Größere Schriftgröße */
+  font-weight: bold; /* Fetter Text */
+  color: #0056b3; /* Stilvolle Farbe, passen Sie nach Wunsch an */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Textschatten für bessere Lesbarkeit */
+  margin-bottom: 20px; /* Abstand unterhalb der Uhr */
+  display: block; /* Blockelement, um es von anderen Inhalten zu trennen */
+  text-align: center; /* Zentrierte Ausrichtung */
+}
+.gif-container {
+  position: fixed; /* Oder 'absolute', je nach Bedarf */
+  bottom: 20px; /* Abstand vom unteren Rand */
+  right: 20px; /* Abstand vom rechten Rand */
+  z-index: 1000; /* Stellen Sie sicher, dass es über anderen Elementen angezeigt wird */
+  background-color: rgba(255, 255, 255, 0.9); /* Leicht transparenter Hintergrund für bessere Lesbarkeit */
+  padding: 10px; /* Innenabstand um das GIF und den Link */
+  border-radius: 8px; /* Abgerundete Ecken */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Schatten für einen schwebenden Effekt */
+  display: flex; /* Flexbox-Layout für bessere Positionierung der Kinder */
+  flex-direction: column; /* Elemente vertikal anordnen */
+  align-items: center; /* Zentriert die Elemente horizontal */
+  justify-content: center; /* Zentriert die Elemente vertikal */
+  text-align: center; /* Zentriert den Text */
+}
+
+.gif-container img {
+  width: 100px; /* oder z.B. width: 10%; je nach gewünschter Größe */
+  height: auto; /* Dies stellt sicher, dass das Bild seine Proportionen beibehält */
+  margin-bottom: 10px; /* Abstand zwischen dem Bild und dem Link */
+}
+
+.creator-link {
+  font-size: 0.8em; /* Anpassen der Schriftgröße des Links */
+  color: #007bff; /* Farbe des Links */
+  text-decoration: none; /* Entfernt die Unterstreichung */
+}
+
+.creator-link:hover {
+  color: #0056b3; /* Farbänderung beim Überfahren mit der Maus */
+}
+
+
+

@@ -145,6 +145,8 @@ console.log(this.produktionslinienDaten)
  
     this.initFocusOnInputField();
     this.cdr.detectChanges();
+    setInterval(() => this.updateDateTime(), 1000);
+ 
   }
   initFocusOnInputField() {
     this.focusListener = this.renderer.listen('window', 'click', () => {
@@ -157,20 +159,43 @@ console.log(this.produktionslinienDaten)
         this.PpArfrag = projekt.Auftrag;
         this.Bezeichnung = 'Produktbezeichnung'; // Fügen Sie Logik hinzu, um diese Daten zu erhalten
         this.sollmenge = 'Menge'; // Fügen Sie Logik hinzu, um diese Daten zu erhalten
-        this.projektStartzeit = new Date(projekt.startzeit);
-        this.aktivSeit = this.berechneAktivSeit(this.projektStartzeit);
         this.aktiveMitarbeiter = projekt.mitarbeiter;
+        // Konvertieren Sie die aus der Datenbank kommende Zeitangabe in ein Date-Objekt
+        this.projektStartzeit = new Date(projekt.startzeit);
+  
+        setInterval(() => {
+          this.aktivSeit = this.berechneAktivSeit();
+        }, 1000);
       }
     });
   }
-
-  private berechneAktivSeit(startzeit: Date): string {
-    // Logik zur Berechnung der seit der Startzeit verstrichenen Zeit
-    // Beispiel: "3 Stunden 45 Minuten aktiv"
-    return 'Berechnete Zeit';
+  
+  formatierteProjektStartzeit!:string;
+  lokalesJetzt!:string;
+  private berechneAktivSeit(): string {
+    if (!this.projektStartzeit) return '';
+  
+    const jetzt = new Date();
+    const differenz = jetzt.getTime() - this.projektStartzeit.getTime();
+  
+    // Konvertieren der Zeiten in deutsche Lokalisierung
+    const lokaleStartzeit = this.projektStartzeit.toLocaleString('de-DE', { timeZone: 'Europe/Berlin' });
+    const lokalesJetzt = jetzt.toLocaleString('de-DE', { timeZone: 'Europe/Berlin' });
+    this.formatierteProjektStartzeit =lokaleStartzeit;
+    this.lokalesJetzt =lokalesJetzt;
+    const stunden = Math.floor(differenz / (1000 * 60 * 60));
+    const minuten = Math.floor((differenz / (1000 * 60)) % 60);
+    const sekunden = Math.floor((differenz / 1000) % 60);
+  
+    return `${stunden} Stunden ${minuten} Minuten ${sekunden} Sekunden `;
   }
-
-
+  currentDate!: string;
+  currentTime!: string;
+  private updateDateTime(): void {
+    const now = new Date();
+    this.currentDate = now.toLocaleDateString();
+    this.currentTime = now.toLocaleTimeString();
+  }
 
   handleInputChange(inputValue: string) {
     this.inputValue = inputValue;
@@ -181,92 +206,122 @@ Mitarbeiter: Mitarbeiter[] = [];
 
 private sendData(inputValue: string) {
   let daten: DataToSend = {
-      typ: inputValue.startsWith('Name') ? 'Mitarbeiter' : inputValue.startsWith('Pr.') ? 'Auftrag' : 'Unbekannt',
-      inputValue: inputValue,
-      produktionslinie: this.produktionslinienDaten,
-      Auftrag: this.auftrag
+    typ: this.bestimmeDatentyp(inputValue),
+    inputValue: inputValue,
+    produktionslinie: this.produktionslinienDaten,
+    Auftrag: this.auftrag
   };
+
   console.log(daten);
 
-  if (daten.typ === 'Mitarbeiter') {
-      daten.projektId = this.currentProjektId;
-      daten.status = this.status;
-
-      // Extrahieren Sie den Namen des Mitarbeiters
-      const mitarbeiterDaten = inputValue.split(',')[0];
-      const mitarbeiterName = mitarbeiterDaten.split(': ')[1].trim();
-      console.log(mitarbeiterName);
-
-      // Überprüfen, ob der Mitarbeiter bereits in der Liste ist
-      let mitarbeiterExistiert = this.aktiveMitarbeiter.some(mitarbeiter => mitarbeiter.name === mitarbeiterName);
-
-      if (mitarbeiterExistiert) {
-          // Senden Sie eine Anfrage an das Backend, da der Mitarbeiter bereits existiert
-          this.sendRequestToBackend(mitarbeiterName); 
-      } else {
-          // Fügen Sie den Mitarbeiter hinzu, da er noch nicht existiert
-          this.aktiveMitarbeiter.push({ name: mitarbeiterName, status: 'Produktionszeit', istProjektleiter: false });
-      }
-  } else {
-      console.error('aktiveMitarbeiter ist nicht definiert');
+  switch (daten.typ) {
+    case 'Mitarbeiter':
+      this.verarbeiteMitarbeiterDaten(daten, inputValue);
+      break;
+    case 'Auftrag':
+      this.verarbeiteAuftragsDaten(daten);
+      break;
+    default:
+      console.error('Unbekannter Datentyp');
   }
+}
 
-      // Beispiel für das Hinzufügen eines Mitarbeiters
-      //this.aktiveMitarbeiter.push({ name: mitarbeiterName, status: 'Produktionszeit', istProjektleiter: false });
+private bestimmeDatentyp(inputValue: string): string {
+  if (inputValue.startsWith('Name')) return 'Mitarbeiter';
+  if (inputValue.startsWith('Pr.')) return 'Auftrag';
+  else{
+    this.resetInput();
+    return 'Unbekannt'};
+}
 
+private verarbeiteMitarbeiterDaten(daten: DataToSend, inputValue: string) {
+  daten.projektId = this.currentProjektId;
+  daten.status = this.status;
 
-     
-    
-    if (daten.typ === 'Auftrag') {
-      daten.Auftrag=inputValue
-      this.scanAuftrag(inputValue)
-      this.checkAktiverAuftrag(daten).then(response => {
-        if (response.existiertAktiverAuftrag) {
-          // Öffnen des Modals mit den Auftragsdetails und Warten auf die Benutzerauswahl
-          const dialogRef = this.dialog.open(AuftragsDetailsModalComponent, {
-            width: '450px',
-            data: response.auftragsDetails
-          });
-  
-          dialogRef.afterClosed().subscribe(result => {
-            if (result) {
-              // Benutzer hat "Bestätigen" gewählt
-              this.sendRequest(daten);
-            } else {
-              // Benutzer hat "Abbrechen" gewählt oder das Modal geschlossen
-              // Hier können Sie ggf. weitere Aktionen durchführen
-        return; // Abbruch, wenn der Benutzer nicht bestätigt
-      }
-    });
+  const mitarbeiterName = this.extrahiereMitarbeiterName(inputValue);
+  console.log(mitarbeiterName);
+
+  const mitarbeiterExistiert = this.aktiveMitarbeiter.some(mitarbeiter => mitarbeiter.name === mitarbeiterName);
+
+  if (mitarbeiterExistiert) {
+    this.sendRequestToBackend(mitarbeiterName);
+    this.resetInput();
   } else {
-    // Wenn kein aktiver Auftrag existiert, senden Sie die Anfrage direkt
+    this.aktiveMitarbeiter.push({ name: mitarbeiterName, status: this.status, istProjektleiter: false });
     this.sendRequest(daten);
+    this.resetInput();
   }
-});
-     
-    }
-  
-  
-    this.http.post('http://localhost:3002/data', daten)
-      .subscribe({
-        next: (response: any) => {
-          this.feedbackMessage = `Daten erfolgreich gespeichert. `;
-          this.currentProjektId = response.id;
-         // daten._id = response.id;
-          if (daten.typ  === 'Mitarbeiter') {
-            // Aktualisieren der Projekt-ID
-          }
-          this.inputValue = ''; // Eingabefeld zurücksetzen
-          this.initFocusOnInputField();
-        },
-        error: (error) => {
-          this.feedbackMessage = 'Fehler beim Speichern der Daten.';
-          console.error('Fehler beim Senden der Daten:', error);
-          this.inputValue = ''; // Eingabefeld zurücksetzen
-          this.initFocusOnInputField();
+}
+
+private extrahiereMitarbeiterName(inputValue: string): string {
+  return inputValue.split(',')[0].split(': ')[1].trim();
+}
+
+private verarbeiteAuftragsDaten(daten: DataToSend) {
+  daten.Auftrag = daten.inputValue;
+  //this.scanAuftrag(daten.inputValue);
+  this.prüfeAktivenAuftrag(daten);
+}
+
+private prüfeAktivenAuftrag(daten: DataToSend) {
+  this.checkAktiverAuftrag(daten).then(response => {
+    if (response.existiertAktiverAuftrag) {
+      // Wenn ein aktiver Auftrag existiert, zeigen Sie den Dialog an
+      const dialogRef = this.dialog.open(AuftragsDetailsModalComponent, {
+        width: '450px',
+        data: response.auftragsDetails
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          // Nur senden, wenn der Benutzer im Dialog "Bestätigen" wählt
+          this.sendRequest(daten);
+          this.scanAuftrag(daten.inputValue);
         }
       });
+    } else {
+      // Wenn kein aktiver Auftrag existiert, senden Sie die Anfrage direkt
+      this.sendRequest(daten);
+      this.scanAuftrag(daten.inputValue);
+    }
+  }).catch(error => {
+    console.error('Fehler beim Überprüfen des aktiven Auftrags:', error);
+    // Optional: Behandeln Sie den Fehlerfall, z.B. mit einer Benutzerbenachrichtigung
+  });
+}
+
+private sendRequest(daten: DataToSend) {
+  this.http.post('http://localhost:3002/data', daten)
+    .subscribe({
+      next: (response: any) => {
+        this.handleErfolgreicheAntwort(response, daten);
+      },
+      error: (error) => {
+        this.handleFehlerAntwort(error);
+      }
+    });
+}
+
+private handleErfolgreicheAntwort(response: any, daten: DataToSend) {
+  this.feedbackMessage = `Daten erfolgreich gespeichert.`;
+  this.currentProjektId = response.id;
+  if (daten.typ === 'Mitarbeiter') {
+    // Aktualisieren der Projekt-ID für Mitarbeiter
   }
+  this.resetInput();
+}
+
+private handleFehlerAntwort(error: any) {
+  this.feedbackMessage = 'Fehler beim Speichern der Daten.';
+  console.error('Fehler beim Senden der Daten:', error);
+  this.resetInput();
+}
+
+private resetInput() {
+  this.inputValue = '';
+  this.initFocusOnInputField();
+}
+
 
   private sendRequestToBackend(mitarbeiterName: string) {
     // URL des Endpunkts mit Einbeziehung der produktionslinienDaten
@@ -317,6 +372,7 @@ private sendData(inputValue: string) {
   
       // Beachten Sie, dass der Typ hier nicht mehr `boolean` ist, sondern `any` oder ein spezifischer Typ, der Ihrer Antwortstruktur entspricht
       const response = await this.http.get<any>(url, { params }).toPromise();
+      console.log('checkAktiverAuftrag',response)
       return response;
     } catch (error) {
       console.error('Fehler beim Überprüfen des aktiven Auftrags:', error);
@@ -327,23 +383,7 @@ private sendData(inputValue: string) {
 
   
   
-  private sendRequest(daten: DataToSend) {
-    this.http.post('http://localhost:3002/data', daten)
-      .subscribe({
-        next: (response: any) => {
-          // Logik nach dem erfolgreichen Senden der Daten
-          console.log('Daten erfolgreich gesendet:', response);
-          // Hier können Sie weitere Aktionen durchführen, z. B. den Benutzer benachrichtigen,
-          // die Ansicht aktualisieren oder zu einer anderen Seite navigieren
-        },
-        error: (error) => {
-          // Fehlerbehandlung
-          console.error('Fehler beim Senden der Daten:', error);
-          // Hier können Sie dem Benutzer eine Fehlermeldung anzeigen oder
-          // andere Maßnahmen zur Fehlerbehebung ergreifen
-        }
-      });
-  }
+
   Bezeichnung!:string;
   sollmenge!:string;
   PpArfrag!:string;

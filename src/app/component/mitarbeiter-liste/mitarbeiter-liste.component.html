@@ -1,0 +1,41 @@
+<div class="navigation-buttons">
+  <button (click)="navigateTo('/mitarbeiter-liste')">Mitarbeiter Liste</button>
+  <button (click)="navigateTo('/mitarbeiter-detail')">Mitarbeiter hinzufügen</button>
+  <button (click)="navigateTo('/projektleiter')">Auftrag Liste</button>
+  <button (click)="navigateTo('/login')">Abmelden</button>
+</div>
+
+
+
+<div class="search-container">
+    <input class="search-input" matInput (input)="applyFilter($event)" placeholder="Suchen...">
+  </div>
+  <mat-table [dataSource]="mitarbeiterListe" class="mat-elevation-z8">
+    <ng-container matColumnDef="MitarbeiterNummer">
+      <mat-header-cell *matHeaderCellDef> Mitarbeiter-Nummer </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.MitarbeiterNummer}} </mat-cell>
+    </ng-container>
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+      </ng-container>
+    
+      <ng-container matColumnDef="projektleiter">
+        <mat-header-cell *matHeaderCellDef> Projektleiter </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.projektleiter ? 'Ja' : 'Nein'}} </mat-cell>
+      </ng-container>
+    
+      <ng-container matColumnDef="aktionen">
+        <mat-header-cell *matHeaderCellDef> Aktionen </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-button (click)="bearbeiten(element)">Bearbeiten</button>
+          <button mat-button (click)="qrCodeAnzeigen(element)">QR-Code</button>
+          <button mat-button (click)="loeschen(element)">Löschen</button>
+        </mat-cell>
+      </ng-container>
+    
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    
+    </mat-table>
+    

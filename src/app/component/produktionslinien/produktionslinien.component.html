@@ -9,6 +9,11 @@
 
 
 
+
+<div class="datetime-container">
+  <span>{{ currentDate }}</span>
+  <span>  {{ currentTime }}</span>
+</div>
 <div class="container">
 
 <div class="projekt-daten">
@@ -21,7 +26,7 @@
      
       
         
-      <p><span class="label">Startzeit:</span><span class="value">{{ projektStartzeit | date: 'medium' }}</span></p>
+      <p><span class="label">Startzeit:</span><span class="value">{{ formatierteProjektStartzeit  }}</span></p>
       <p><span class="label">Aktiv seit:</span><span class="value">{{ aktivSeit }}</span></p>
     </div>
 

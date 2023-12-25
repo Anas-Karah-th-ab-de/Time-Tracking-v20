@@ -2,3 +2,37 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.navigation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Abstand zwischen den Buttons */
+    margin-bottom: 20px; /* Abstand nach unten */
+  }
+  
+  .navigation-buttons button {
+    background-color: #007bff; /* Hintergrundfarbe der Buttons */
+    color: white; /* Textfarbe */
+    border: none; /* Entfernen des Standard-Borderrahmens */
+    padding: 10px 20px; /* Innenabstand */
+    border-radius: 5px; /* Abgerundete Ecken */
+    font-size: 16px; /* Schriftgröße */
+    cursor: pointer; /* Cursor-Stil */
+    transition: background-color 0.3s; /* Übergangseffekt für den Hintergrund */
+  }
+  
+  .navigation-buttons button:hover {
+    background-color: #0056b3; /* Hintergrundfarbe beim Überfahren mit der Maus */
+  }
+  
+  .navigation-buttons button:focus {
+    outline: none; /* Entfernen des Fokus-Rahmens */
+    box-shadow: 0 0 0 2px rgba(0,123,255,.5); /* Fokus-Schatten */
+  }
+  
+  /* Optional: Anpassung für kleinere Bildschirme */
+  @media screen and (max-width: 600px) {
+    .navigation-buttons {
+      flex-direction: column; /* Stapeln der Buttons auf kleineren Bildschirmen */
+    }
+  }
+  

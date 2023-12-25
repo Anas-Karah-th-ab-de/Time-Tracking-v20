@@ -1,0 +1,147 @@
+<div class="pallteninfo">
+
+  
+    <h3>Mitarbeiterdaten</h3>
+    <table>
+      <tr>
+        <th>Name</th>
+        <th *ngFor="let mitarbeiter of mitarbeiterDaten">{{ mitarbeiter.name }}</th>
+        <th>Summe</th>
+      </tr>
+      <tr>
+        <td>Stückzahl</td>
+        <td *ngFor="let mitarbeiter of mitarbeiterDaten; let i = index">
+          <ng-container *ngIf="editMode; else stueckzahl">
+            <input type="number" [(ngModel)]="mitarbeiter.stueckanzahl"
+                   (ngModelChange)="aktualisiereBerechnungen()" 
+                   >
+          </ng-container>
+          <ng-template #stueckzahl>{{ mitarbeiter.stueckanzahl }}</ng-template>
+        </td>
+        <td>{{ Gesamtstueckzahlmitarbeiter }}</td>
+      </tr>
+      
+    </table>
+   
+    
+    <!--<h1 mat-dialog-title>Paletteninformation</h1>-->
+    <div mat-dialog-content>
+    
+      <!-- Volle Paletten -->
+      <h3>Volle Paletten</h3>
+      <table>
+        <tr>
+          <th>Paletten</th>
+          <th>Kartons</th>
+          <th>Stück pro Karton</th>
+          <th>Stückzahl gesamt</th>
+        </tr>
+        <tr *ngIf="!editMode">
+          <td>{{ formVollePaletten.paletten }}</td>
+          <td>{{ formVollePaletten.kartons }}</td>
+          <td>{{ formVollePaletten.stueckKarton }}</td>
+          <td>{{ formVollePaletten.gesamtmenge }}</td>
+        </tr>
+        <tr *ngIf="editMode">
+          <td>{{ formVollePaletten.paletten }}</td>
+          <td>
+            <input id="vollePalettenKartons" type="number" [(ngModel)]="formVollePaletten.kartons" 
+                   (ngModelChange)="aktualisiereBerechnungen()"
+                  placeholder="Anzahl der Kartons pro Palette">
+          </td>
+          <td>
+            <input type="number" [(ngModel)]="formVollePaletten.stueckKarton"
+                   (ngModelChange)="aktualisiereBerechnungen()"
+                  >
+          </td>
+          <td>{{ formVollePaletten.gesamtmenge }}</td>
+        </tr>
+        
+      </table>
+    
+      <!-- Restpaletten -->
+      <h3>Restpaletten</h3>
+      <table>
+        <tr>
+          <th>Paletten</th>
+          <th>Kartons</th>
+          <th>Stück pro Karton</th>
+          <th>Stück in Restkarton</th>
+          <th>Stückzahl gesamt</th>
+        </tr>
+        <tr *ngIf="!editMode">
+          <td>{{ formRestPaletten.paletten }}</td>
+          <td>{{ formRestPaletten.kartons }}</td>
+          <td>{{ formRestPaletten.stueckKarton }}</td>
+          <td>{{ formRestPaletten.stueckRestkarton }}</td>
+          <td>{{ formRestPaletten.gesamtmenge }}</td>
+        </tr>
+        <tr *ngIf="editMode">
+          <td>
+           {{formRestPaletten.paletten}}
+          </td>
+          <td>
+            {{formRestPaletten.kartons}}
+          </td>
+          <td>
+            {{formRestPaletten.stueckKarton}}
+          </td>
+          <td>
+            {{formRestPaletten.stueckRestkarton}}
+           
+          </td>
+          <td>
+           {{formRestPaletten.gesamtmenge}}
+          </td>
+        </tr>
+        
+      </table>
+    
+      <!-- Gesamtdaten -->
+      <h3>Gesamtdaten</h3>
+      <table>
+        <tr>
+          <th>Liefermenge</th>
+          <th>Muster Kunde</th>
+          <th>Muster PP</th>
+          <th>Gesamtmenge</th>
+          <th>Ausschuss</th>
+        </tr>
+        <tr *ngIf="!editMode">
+          <td>{{ formGesamt.liefermenge }}</td>
+          <td>{{ formGesamt.musterKunde }}</td>
+          <td>{{ formGesamt.musterPP }}</td>
+          <td>{{ formGesamt.gesamtmenge }}</td>
+          <td>{{ formGesamt.ausschuss }}</td>
+        </tr>
+        <tr *ngIf="editMode">
+          <td>
+            {{ formGesamt.gesamtmenge }}
+          </td>
+          <td>
+            <input id="gesamtMusterKunde" type="number" [(ngModel)]="formGesamt.musterKunde"
+                   (ngModelChange)="aktualisiereBerechnungen()" >
+          </td>
+          <td>
+            <input id="gesamtMusterPP" type="number" [(ngModel)]="formGesamt.musterPP"
+                   (ngModelChange)="aktualisiereBerechnungen()" >
+          </td>
+          <td>
+            {{ formGesamt.gesamtmenge }}
+          </td>
+          <td>
+            <input id="gesamtAusschuss" type="number" [(ngModel)]="formGesamt.ausschuss"
+                   (ngModelChange)="aktualisiereBerechnungen()">
+          </td>
+        </tr>
+        
+      </table>
+    
+    </div>
+    <div mat-dialog-actions>
+      <button mat-button (click)="editMode = !editMode">{{ editMode ? 'Speichern' : 'Bearbeiten' }}</button>
+      <button mat-button (click)="bestaetigenUndSpeichern()">Bestätigen</button>
+    </div>
+  
+  
+  

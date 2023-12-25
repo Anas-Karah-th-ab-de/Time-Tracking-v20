@@ -1,0 +1,118 @@
+/* Haupt-Container */
+div {
+    font-family: 'Arial', sans-serif;
+    max-width: 1300px;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Überschrift */
+  h1, h3, h4 {
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  /* Tabelle für Projekte */
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  ul li {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  ul li:hover {
+    background-color: #eaeaea;
+  }
+  
+  /* Detailansicht */
+  div > div {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #e3e3e3;
+    border-radius: 5px;
+  }
+  
+  /* Mitarbeiter Tabelle */
+  ul.mitarbeiter-liste {
+    padding: 0;
+    list-style: none;
+  }
+  
+  ul.mitarbeiter-liste li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    margin-bottom: 5px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  
+  /* Bearbeitungsbutton */
+  button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  /* Container für die Filter-Inputs */
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Abstand zwischen den Elementen */
+    justify-content: center; /* Zentrieren der Elemente */
+    margin-bottom: 20px; /* Abstand nach unten */
+  }
+  
+  /* Stil für alle Input-Felder */
+  input[type="text"], input[type="date"] {
+    flex: 1; /* Flexibles Wachstum der Elemente */
+    min-width: 150px; /* Minimale Breite eines Eingabefeldes */
+    padding: 10px; /* Innenabstand */
+    border: 2px solid #ccc; /* Rahmenfarbe */
+    border-radius: 4px; /* Abgerundete Ecken */
+    font-size: 16px; /* Schriftgröße */
+    background-color: white; /* Hintergrundfarbe */
+    color: #555; /* Textfarbe */
+  }
+  
+  input[type="text"]:focus, input[type="date"]:focus {
+    border-color: #007bff; /* Rahmenfarbe beim Fokussieren */
+    outline: none; /* Entfernen des Outlines beim Fokussieren */
+  }
+  
+  /* Optional: Media Query für kleinere Bildschirme */
+  @media screen and (max-width: 600px) {
+    .filter-container {
+      flex-direction: column; /* Stapeln der Elemente auf kleineren Bildschirmen */
+    }
+  }
+  
+
+
+
+  
+
