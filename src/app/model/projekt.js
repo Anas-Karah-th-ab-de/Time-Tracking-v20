@@ -26,7 +26,8 @@ const palettenDatenSchema = new mongoose.Schema({
   const zeitIntervallSchema = new mongoose.Schema({
     nummer: Number,
     start: Date,
-    ende: Date
+    ende: Date,
+    dauer:Number
   });
   
   const mitarbeiterSchema = new mongoose.Schema({
@@ -34,9 +35,11 @@ const palettenDatenSchema = new mongoose.Schema({
     _id:String,
     name: String,
     anmeldezeit:Date,
+    stueckanzahl:Number,
     Produktionszeit: [zeitIntervallSchema],
     Ruestzeit: [zeitIntervallSchema],
-    Wartezeit: [zeitIntervallSchema]
+    Wartezeit: [zeitIntervallSchema],
+   
   });
   
 const projektSchema = new mongoose.Schema({

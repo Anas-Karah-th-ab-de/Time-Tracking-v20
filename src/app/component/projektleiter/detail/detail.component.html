@@ -1,5 +1,44 @@
-<div class="pallteninfo">
+<div class="projekt-container">
+  <h2>Letztes Projekt</h2>
 
+  <div class="daten-sektion">
+    <h3>Volle Paletten</h3>
+    <div class="daten-grid">
+      <div><strong>Paletten:</strong> <span>{{ letzteformVollePaletten.paletten }}</span></div>
+      <div><strong>Kartons:</strong> <span>{{ letzteformVollePaletten.kartons }}</span></div>
+      <div><strong>Stück pro Karton:</strong> <span>{{ letzteformVollePaletten.stueckKarton }}</span></div>
+      <div><strong>Stückzahl gesamt:</strong> <span>{{ letzteformVollePaletten.gesamtmenge }}</span></div>
+    </div>
+  </div>
+
+  <div class="daten-sektion">
+    <h3>Rest Paletten</h3>
+    <div class="daten-grid">
+      <div><strong>Paletten:</strong> <span>{{ letzteformRestPaletten.paletten }}</span></div>
+      <div><strong>Kartons:</strong> <span>{{ letzteformRestPaletten.kartons }}</span></div>
+      <div><strong>Stück pro Restkarton:</strong> <span>{{ letzteformRestPaletten.stueckRestkarton }}</span></div>
+      <div><strong>Stückzahl gesamt:</strong> <span>{{ letzteformRestPaletten.gesamtmenge }}</span></div>
+    </div>
+  </div>
+
+  <div class="daten-sektion">
+    <h3>Gesamtdaten</h3>
+    <div class="daten-grid">
+      <div><strong>Liefermenge:</strong> <span>{{ letzteformGesamt.liefermenge }}</span></div>
+      <div><strong>Muster Kunde:</strong> <span>{{ letzteformGesamt.musterKunde }}</span></div>
+      <div><strong>Muster PP:</strong> <span>{{ letzteformGesamt.musterPP }}</span></div>
+      <div><strong>Gesamtmenge:</strong> <span>{{ letzteformGesamt.gesamtmenge }}</span></div>
+      <div><strong>Ausschuss:</strong> <span>{{ letzteformGesamt.ausschuss }}</span></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="pallteninfo">
+  
+  <h2>Aktuelle Projekt</h2>
   
     <h3>Mitarbeiterdaten</h3>
     <table>

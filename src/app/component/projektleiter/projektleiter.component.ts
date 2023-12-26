@@ -51,7 +51,25 @@ export class ProjektleiterComponent implements OnInit {
   }
 
   onBearbeiten(): void {
-    // Bearbeitungslogik
+    if (!this.ausgewaehltesProjekt) {
+      console.log('Kein Projekt ausgewählt');
+      return;
+    }
+    
+    // Pfad zur Detailkomponente, z. B. '/projektdetails'
+    const detailPath = '/projektdetails';
+  
+    // Parameter für die Navigation
+    const navigationExtras = {
+      queryParams: {
+        produktionslinie: this.ausgewaehltesProjekt.produktionslinie,
+        auftrag: this.ausgewaehltesProjekt.Auftrag,
+        datum: this.ausgewaehltesProjekt.startzeit // oder ein anderes relevantes Datum
+      }
+    };
+  
+    // Navigieren zur Detailkomponente mit den Parametern
+    this.router.navigate([detailPath], navigationExtras);
   }
   mitarbeiterFilter: string =  '';
   filterByAuftrag(projekt: any): boolean {

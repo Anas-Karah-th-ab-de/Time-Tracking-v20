@@ -246,7 +246,7 @@ private verarbeiteMitarbeiterDaten(daten: DataToSend, inputValue: string) {
   if (mitarbeiterExistiert) {
     this.sendRequestToBackend(mitarbeiterName);
     this.resetInput();
-  } else {
+  }if (!mitarbeiterExistiert){
     this.aktiveMitarbeiter.push({ name: mitarbeiterName, status: this.status, istProjektleiter: false });
     this.sendRequest(daten);
     this.resetInput();
@@ -275,7 +275,7 @@ private prüfeAktivenAuftrag(daten: DataToSend) {
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
           // Nur senden, wenn der Benutzer im Dialog "Bestätigen" wählt
-          this.sendRequest(daten);
+          this.neueauftrag(daten);
           this.scanAuftrag(daten.inputValue);
         }
       });
@@ -292,6 +292,17 @@ private prüfeAktivenAuftrag(daten: DataToSend) {
 
 private sendRequest(daten: DataToSend) {
   this.http.post('http://localhost:3002/data', daten)
+    .subscribe({
+      next: (response: any) => {
+        this.handleErfolgreicheAntwort(response, daten);
+      },
+      error: (error) => {
+        this.handleFehlerAntwort(error);
+      }
+    });
+}
+private neueauftrag(daten: DataToSend) {
+  this.http.post(`http://localhost:3002/neuerAuftragMitarbeiter/${this.produktionslinienDaten}`,daten)
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);

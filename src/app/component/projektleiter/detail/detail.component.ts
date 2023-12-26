@@ -1,10 +1,13 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
-
+import { OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Mitarbeiterku } from '../../../model/mitarbeiter.model';
-
+import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, throwError } from 'rxjs';
 interface RecognizedMitarbeiter {
   _id: string;
   name: string;
@@ -14,14 +17,18 @@ interface RecognizedMitarbeiter {
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.css'
 })
-export class DetailComponent {
+export class DetailComponent implements OnInit{
+// In Ihrer DetailsComponent-Klasse
 
+
+aktuellesProjekt: any;
+letzteProjekt: any;
   mitarbeiterDatenMap = new Map<string, any>();
   mitarbeiterDaten: Mitarbeiterku[] = [];
   editMode: boolean = false;
   recognizedMitarbeiters: RecognizedMitarbeiter[] = [];
   aktuellesMitarbeiterName: string = '';
-  constructor(private snackBar: MatSnackBar,private dialog: MatDialog) {  (window as any).isControlledReload = false; }
+  constructor(private route: ActivatedRoute, private http: HttpClient,private router: Router,private snackBar: MatSnackBar,private dialog: MatDialog) {  (window as any).isControlledReload = false; }
   projektleiterFehlermeldung = '';
   haFehlermeldung = '';
   mitarbeiterFehlermeldung = '';
@@ -40,7 +47,40 @@ export class DetailComponent {
   produktionslinieEingegeben = false;
 
   // Ihre weiteren Eigenschaften und Methoden...
-  
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const produktionslinie = params['produktionslinie'];
+      const auftrag = params['auftrag'];
+      const datum = params['datum'];
+      console.log(produktionslinie, auftrag, datum);
+
+      // Abrufen des Projekts vom Server
+      this.http.get('http://localhost:3002/projekt', { params: { produktionslinie, auftrag, datum } })
+        .subscribe(projekt => {
+          this.aktuellesProjekt = projekt;
+          this.mitarbeiterDaten= this.aktuellesProjekt.mitarbeiter;
+          this.formVollePaletten=this.aktuellesProjekt.palettenDaten.
+          vollePaletten;
+          this.formRestPaletten=this.aktuellesProjekt.palettenDaten.
+          restPaletten;
+          this.formGesamt=this.aktuellesProjekt.palettenDaten.
+          gesamtDaten;
+        });
+        this.http.get('http://localhost:3002/api/vorletztes-nicht-aktives-projekt', { params: { produktionslinie, auftrag } })
+        .subscribe(projekt => {
+          this.letzteProjekt = projekt;
+          this.letzteformVollePaletten=this.letzteProjekt.palettenDaten.
+          vollePaletten;
+          this.letzteformRestPaletten=this.letzteProjekt.palettenDaten.
+          restPaletten;
+          this.letzteformGesamt=this.letzteProjekt.palettenDaten.
+          gesamtDaten;
+         
+         console.log( projekt)
+        });
+    });
+   
+  }
   private _produktionslinie = '';
 
   get produktionslinie(): string {
@@ -64,6 +104,9 @@ export class DetailComponent {
   formVollePaletten = { paletten: 0, kartons: 0, stueckKarton: 0, gesamtmenge: 0 };
   formRestPaletten = { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 };
   formGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 };
+  letzteformVollePaletten = { paletten: 0, kartons: 0, stueckKarton: 0, gesamtmenge: 0 };
+  letzteformRestPaletten = { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 };
+  letzteformGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 };
 
   vollePalettenBestaetigt = { paletten: false, kartons: false, stueckKarton: false };
   restPalettenBestaetigt = { paletten: false, kartons: false, stueckKarton: false, stueckRestkarton: false };
@@ -156,28 +199,35 @@ this.formRestPaletten.kartons= (this.formRestPaletten.gesamtmenge -this.formRest
     
   }
   
-
-  bestaetigenUndSpeichern() {
-    // Logik zur Überprüfung oder Verarbeitung der Daten vor dem Speichern
-    // Beispiel:
-   
-
-    
-    const dataToSend = {
-      vollePaletten: this.formVollePaletten,
-      restPaletten: this.formRestPaletten,
-      gesamtDaten: this.formGesamt,
-      mitarbeiter: this.mitarbeiterDaten
+  bestaetigenUndSpeichern(): void {
+    const projektDaten = {
+      // ... Sammeln Sie alle relevanten Daten aus dem Formular ...
+      palettenDaten: {
+        vollePaletten: this.formVollePaletten,
+        restPaletten: this.formRestPaletten,
+        gesamtDaten: this.formGesamt
+      },
+      mitarbeiter: this.mitarbeiterDaten // Angenommen, dies ist korrekt formatiert
     };
-    // //console.log('ssssssssssssssss',this.mitarbeiterDaten)
-    // //console.log('dataToSend',dataToSend)
-    // Beispiel für das Speichern der Daten
-   
-//console.log('ssssssssssssssss',this.mitarbeiterDaten)
-      // //console.log('dataToSend',dataToSend)
-     
+  
+    this.updateProject(this.aktuellesProjekt._id, projektDaten).subscribe(
+      response => {
+        console.log('Projekt erfolgreich aktualisiert', response);
+        // Weiterer Code nach erfolgreichem Update
+        this.router.navigate(['/projektleiter']);
+      },
+      error => {
+        console.error('Fehler beim Aktualisieren des Projekts', error);
+        // Fehlerbehandlung
+      }
+    );
   }
   
+// Angular Service-Methode zum Aktualisieren eines Projekts
+updateProject(projektId: string, projektDaten: any): Observable<any> {
+  return this.http.put(`http://localhost:3002/projekt/${projektId}`, projektDaten);
+}
+
   validateFormData() {
     // Validierung der Formulardaten vor dem Senden
     // Beispiel: Überprüfung, ob alle notwendigen Felder ausgefüllt sind

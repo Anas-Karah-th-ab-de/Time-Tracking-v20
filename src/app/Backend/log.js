@@ -291,7 +291,7 @@ const abmeldeMitarbeiterVonAllenProjekten = async (mitarbeiterName) => {
             let offenesIntervall = mitarbeiter[aktivitaet].find(intervall => !intervall.ende);
             if (offenesIntervall) {
               offenesIntervall.ende = aktuellesDatum;
-            }
+              offenesIntervall.dauer = Math.round((aktuellesDatum.getTime() - new Date(offenesIntervall.start).getTime()) / 60000);            }
           }
         });
 
@@ -414,18 +414,7 @@ app.post('/checkMitarbeiter/:produktionslinie', async (req, res) => {
       }
 
       let mitarbeiter = projekt.mitarbeiter.find(m => m.name === mitarbeiterName);
-      if (!mitarbeiter) {
-          // Falls der Mitarbeiter noch nicht existiert, fügen Sie ihn hinzu
-          mitarbeiter = { 
-              _id: new mongoose.Types.ObjectId(), /* generieren Sie eine geeignete ID */
-              name: mitarbeiterName,
-              anmeldezeit: new Date(),
-              Produktionszeit: [],
-              Ruestzeit: [],
-              Wartezeit: []
-          };
-          projekt.mitarbeiter.push(mitarbeiter);
-      }
+  
 
       // Überprüfen, ob ein Eintrag ohne Ende vorhanden ist
       const hatOffeneEinträge = mitarbeiter[status] && mitarbeiter[status].some(s => s.ende === null);
@@ -440,7 +429,7 @@ app.post('/checkMitarbeiter/:produktionslinie', async (req, res) => {
           // Fügen Sie den neuen Eintrag mit der berechneten Nummer hinzu
           mitarbeiter[status].push({ nummer: neueNummer, start: new Date(), ende: null });
      
-          projekt.mitarbeiter.push(mitarbeiter);
+          
           console.log(mitarbeiter)
           await projekt.save();
           res.json({ message: 'Mitarbeiter erneuet angemeldet' });
@@ -454,16 +443,157 @@ app.post('/checkMitarbeiter/:produktionslinie', async (req, res) => {
 //Projekt leiter
 app.get('/projekte/nichtAktiv', async (req, res) => {
   try {
-    const Projekts = await Projekt.find({ aktiv: false });
+    // Finden Sie Projekte, die nicht aktiv sind und keine Palettendaten haben
+    const Projekts = await Projekt.find({ 
+      aktiv: false, 
+      palettenDaten: { $exists: false } // $exists: false prüft, ob das Feld nicht existiert
+    });
 
     if (Projekts.length === 0) {
-        return res.status(404).send('Kein Projekt gefunden.');
+      return res.status(404).send('Kein Projekt gefunden.');
     }
 
     res.json(Projekts);
   } catch (err) {
     console.error(err);
     res.status(500).send('Serverfehler');
+  }
+});
+
+
+
+app.post('/neuerAuftragMitarbeiter/:produktionslinie', async (req, res) => {
+  try {
+    const produktionslinie = req.params.produktionslinie;
+    const { Auftrag } = req.body; // Statt req.body.Auftrag
+    console.log(Auftrag); // Sollte 'Pr.220288037' ausgeben, falls im Anfragekörper vorhanden
+    console.log(req.body);
+    // Suche nach dem aktuellen Projekt für die Produktionslinie
+    let aktuellesProjekt = await Projekt.findOne({ produktionslinie, aktiv: true });
+
+    if (!aktuellesProjekt) {
+      return res.status(400).send({ message: 'Kein aktives Projekt gefunden' });
+    }
+
+    // Filtern der Mitarbeiter mit offenen Zeiten
+    const mitarbeiterMitOffenenZeiten = aktuellesProjekt.mitarbeiter.filter(mitarbeiter =>
+      ['Produktionszeit', 'Ruestzeit', 'Wartezeit'].some(aktivitaet =>
+        Array.isArray(mitarbeiter[aktivitaet]) && mitarbeiter[aktivitaet].some(s => s.ende === null)
+      )
+    );
+
+    if (mitarbeiterMitOffenenZeiten.length === 0) {
+      return res.status(400).send({ message: 'Keine Mitarbeiter mit offenen Zeiten gefunden' });
+    }
+    const kopierteMitarbeiter = mitarbeiterMitOffenenZeiten.map(mitarbeiter => {
+
+      
+      return {
+        _id: new mongoose.Types.ObjectId(), // Erstellt eine neue ID für jeden Mitarbeiter
+        name: mitarbeiter.name,
+        Produktionszeit: [{ nummer: 1, start: new Date(), ende: null }],
+        Ruestzeit: [],
+        Wartezeit: [] // Weitere relevante Eigenschaften können hier übernommen werden, außer Zeitdatensätzen
+      };
+    });
+        // Schließen aller offenen Zeiten dieser Mitarbeiter
+    mitarbeiterMitOffenenZeiten.forEach(mitarbeiter => {
+      ['Produktionszeit', 'Ruestzeit', 'Wartezeit'].forEach(aktivitaet => {
+        mitarbeiter[aktivitaet].forEach(s => {
+          if (s.ende === null) {
+            s.ende = new Date();
+          }
+        });
+      });
+    });
+
+    // Erstellen eines neuen Projekts mit diesen Mitarbeitern und dem neuen Auftrag
+    const neuesProjekt = new Projekt({
+      produktionslinie,
+      Auftrag: Auftrag,
+      startzeit: new Date(),
+      aktiv: true,
+      mitarbeiter: kopierteMitarbeiter
+    });
+
+    // Speichern des neuen Projekts
+    await neuesProjekt.save();
+
+    // Deaktivieren des aktuellen Projekts
+    aktuellesProjekt.aktiv = false;
+    aktuellesProjekt.endzeit = new Date();
+    await aktuellesProjekt.save();
+
+    res.status(200).json({ message: 'Neues Projekt erstellt mit Mitarbeitern mit geschlossenen Zeiten', neuesProjekt });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Fehler beim Verarbeiten der Anfrage' });
+  }
+});
+
+//bearbeiten
+app.get('/api/vorletztes-nicht-aktives-projekt', async (req, res) => {
+  try {
+    const { produktionslinie, auftrag } = req.query;
+
+    // Finden Sie alle nicht aktiven Projekte, die den Kriterien entsprechen
+    const projekte = await Projekt.find({
+      produktionslinie: produktionslinie,
+      Auftrag: auftrag,
+      aktiv: false
+    }).sort({ startzeit: -1 }); // Sortieren nach Startzeit in absteigender Reihenfolge
+
+    if (projekte.length < 2) {
+      return res.status(404).send('Nicht genügend nicht aktive Projekte gefunden');
+    }
+
+    // Wählen Sie das vorletzte Projekt aus der Liste
+    const vorletztesProjekt = projekte[1];
+
+    res.status(200).json(vorletztesProjekt);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Fehler beim Abrufen des Projekts');
+  }
+});
+
+app.get('/projekt', async (req, res) => {
+  try {
+    const { produktionslinie, auftrag, datum } = req.query;
+
+    // Logik zum Finden des Projekts basierend auf den Parametern
+    const projekt = await Projekt.findOne({ 
+      produktionslinie: produktionslinie, 
+      Auftrag: auftrag, 
+      startzeit: new Date(datum) 
+    });
+
+    if (!projekt) {
+      return res.status(404).send('Projekt nicht gefunden');
+    }
+    //console.log(projekt)
+    res.status(200).json(projekt);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Fehler beim Abrufen des Projekts');
+  }
+});
+app.put('/projekt/:projektId', async (req, res) => {
+  try {
+    const projektId = req.params.projektId;
+    const projektDaten = req.body;
+console.log(req.body)
+    // Logik zum Aktualisieren des Projekts mit der ID projektId
+    const aktualisiertesProjekt = await Projekt.findByIdAndUpdate(projektId, projektDaten, { new: true });
+
+    if (!aktualisiertesProjekt) {
+      return res.status(404).send('Projekt nicht gefunden');
+    }
+
+    res.status(200).json(aktualisiertesProjekt);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Fehler beim Aktualisieren des Projekts');
   }
 });
 

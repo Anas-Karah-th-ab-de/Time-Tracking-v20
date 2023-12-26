@@ -19,7 +19,7 @@ const routes: Routes = [
   { path: 'personalschleuse', component: PersonalschleuseComponent },
   { path: 'projektleiter', component: ProjektleiterComponent },
   { path: 'projektleiter/:projektleiter', component: ProjektleiterComponent },
-  { path: 'projekt/:Auftrag', component: DetailComponent },
+  { path: 'projektdetails', component: DetailComponent },
   { path: 'mitarbeiter-liste', component: MitarbeiterListeComponent },
   { path: 'mitarbeiter-detail', component: MitarbeiterDetailComponent },
   { path: 'mitarbeiter-erstellen', component: MitarbeiterErstellenComponent },
