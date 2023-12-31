@@ -19,6 +19,21 @@ interface DataToSend {
  // _id:string;
   Auftrag:string;
 }
+interface ZeitIntervall {
+  nummer: number;
+  start: Date;
+  ende: Date;
+  dauer: number;
+}
+
+interface Mitarbeiter {
+  _id?: string;
+  name: string;
+  anmeldezeit: Date;
+  Produktionszeit: ZeitIntervall[];
+  Ruestzeit: ZeitIntervall[];
+  Wartezeit: ZeitIntervall[];
+}
 
 interface Mitarbeiter {
   name: string;
@@ -67,7 +82,7 @@ export class ProduktionslinienComponent implements AfterViewInit {
       dialogRef.afterClosed().subscribe(projektleiterName => {
         if (projektleiterName) {
           this.projektleiterName=projektleiterName;
-          console.log(this.projektleiterName)
+          //console.log(this.projektleiterName)
           // Wenn ein Projektleiter-Name vorhanden ist, Status wechseln
           this.wechselStatus();
           this.initFocusOnInputField();
@@ -101,7 +116,7 @@ export class ProduktionslinienComponent implements AfterViewInit {
           // Setzen des Projektleiters auf Rüstzeit
           mitarbeiter.status = 'Ruestzeit';
         }
-        console.log( this.aktiveMitarbeiter)
+        //console.log( this.aktiveMitarbeiter)
       });
       this.sd();
     } else {
@@ -125,9 +140,9 @@ export class ProduktionslinienComponent implements AfterViewInit {
   sd(){
     this.aktiveMitarbeiter.forEach(mitarbeiter => {
       // Update the status locally
-console.log(this.produktionslinienDaten)
+//console.log(this.produktionslinienDaten)
       // Send request to backend to update the status
-      this.http.put(`http://localhost:3002/aktualisiereStatus/${this.produktionslinienDaten}`, {
+      this.http.put(`http://192.168.100.1:3002/aktualisiereStatus/${this.produktionslinienDaten}`, {
         mitarbeiterName: mitarbeiter.name,
         neueAktivitaet: mitarbeiter.status
       }).subscribe({
@@ -146,6 +161,7 @@ console.log(this.produktionslinienDaten)
     this.initFocusOnInputField();
     this.cdr.detectChanges();
     setInterval(() => this.updateDateTime(), 1000);
+    setInterval(() =>  this.ladeAktivesProjekt(), 6000);
  
   }
   initFocusOnInputField() {
@@ -154,20 +170,43 @@ console.log(this.produktionslinienDaten)
     });
   }
   private ladeAktivesProjekt() {
-    this.http.get<any>(`http://localhost:3002/aktives-projekt/${this.produktionslinienDaten}`).subscribe(projekt => {
+    this.http.get<any>(`http://192.168.100.1:3002/aktives-projekt/${this.produktionslinienDaten}`).subscribe(projekt => {
       if (projekt) {
         this.PpArfrag = projekt.Auftrag;
         this.Bezeichnung = 'Produktbezeichnung'; // Fügen Sie Logik hinzu, um diese Daten zu erhalten
         this.sollmenge = 'Menge'; // Fügen Sie Logik hinzu, um diese Daten zu erhalten
-        this.aktiveMitarbeiter = projekt.mitarbeiter;
-        // Konvertieren Sie die aus der Datenbank kommende Zeitangabe in ein Date-Objekt
+        this.aktiveMitarbeiter = projekt.mitarbeiter.map((mitarbeiter: Mitarbeiter) => {
+          return {
+            ...mitarbeiter,
+            status: this.bestimmeAktuellenStatus(mitarbeiter)
+          };
+        });        // Konvertieren Sie die aus der Datenbank kommende Zeitangabe in ein Date-Objekt
         this.projektStartzeit = new Date(projekt.startzeit);
-  
+        this.scanAuftrag( this.PpArfrag);
         setInterval(() => {
           this.aktivSeit = this.berechneAktivSeit();
         }, 1000);
       }
     });
+  }
+  private bestimmeAktuellenStatus(mitarbeiter: Mitarbeiter): string {
+    const offeneProduktionszeit = mitarbeiter.Produktionszeit.find(zeit => !zeit.ende);
+    const offeneRuestzeit = mitarbeiter.Ruestzeit.find(zeit => !zeit.ende);
+    const offeneWartezeit = mitarbeiter.Wartezeit.find(zeit => !zeit.ende);
+  
+    if (offeneProduktionszeit) {
+      this.istProduktionszeit = true;
+      return 'Produktionszeit';
+    }
+    if (offeneRuestzeit) {
+      this.istProduktionszeit = false; // Oder was auch immer der Zustand sein soll, wenn der Mitarbeiter in Rüstzeit ist
+      return 'Ruestzeit';
+    }
+    if (offeneWartezeit) {
+      this.istProduktionszeit = false;
+      return 'Wartezeit';
+    }
+    return 'Abgemeldet'; // Oder einen anderen Standardstatus
   }
   
   formatierteProjektStartzeit!:string;
@@ -212,7 +251,7 @@ private sendData(inputValue: string) {
     Auftrag: this.auftrag
   };
 
-  console.log(daten);
+ // console.log(daten);
 
   switch (daten.typ) {
     case 'Mitarbeiter':
@@ -231,6 +270,7 @@ private bestimmeDatentyp(inputValue: string): string {
   if (inputValue.startsWith('Pr.')) return 'Auftrag';
   else{
     this.resetInput();
+    this.aktualisiereSeite();
     return 'Unbekannt'};
 }
 
@@ -239,17 +279,29 @@ private verarbeiteMitarbeiterDaten(daten: DataToSend, inputValue: string) {
   daten.status = this.status;
 
   const mitarbeiterName = this.extrahiereMitarbeiterName(inputValue);
-  console.log(mitarbeiterName);
+ // console.log(mitarbeiterName);
 
   const mitarbeiterExistiert = this.aktiveMitarbeiter.some(mitarbeiter => mitarbeiter.name === mitarbeiterName);
 
   if (mitarbeiterExistiert) {
     this.sendRequestToBackend(mitarbeiterName);
     this.resetInput();
+    this.aktualisiereSeite();
   }if (!mitarbeiterExistiert){
-    this.aktiveMitarbeiter.push({ name: mitarbeiterName, status: this.status, istProjektleiter: false });
+    this.aktiveMitarbeiter.push({
+      name: mitarbeiterName,
+      status: this.status,
+      istProjektleiter: false,
+      anmeldezeit: new Date(), // Beispielwert
+      Produktionszeit: [],    // Beispielwert
+      Ruestzeit: [],          // Beispielwert
+      Wartezeit: [],          // Beispielwert
+      // Fügen Sie weitere notwendige Eigenschaften hinzu
+    });
+    
     this.sendRequest(daten);
     this.resetInput();
+    this.aktualisiereSeite();
   }
 }
 
@@ -291,21 +343,28 @@ private prüfeAktivenAuftrag(daten: DataToSend) {
 }
 
 private sendRequest(daten: DataToSend) {
-  this.http.post('http://localhost:3002/data', daten)
+  this.http.post('http://192.168.100.1:3002/data', daten)
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);
+        this.aktualisiereSeite();
       },
       error: (error) => {
         this.handleFehlerAntwort(error);
       }
     });
 }
+private aktualisiereSeite() {
+  window.location.reload(); // Standardmethode zum Neuladen der Seite
+  // Alternativ können Sie hier auch eine andere Logik einfügen, 
+  // um bestimmte Teile der Seite zu aktualisieren, anstatt die ganze Seite neu zu laden.
+}
 private neueauftrag(daten: DataToSend) {
-  this.http.post(`http://localhost:3002/neuerAuftragMitarbeiter/${this.produktionslinienDaten}`,daten)
+  this.http.post(`http://192.168.100.1:3002/neuerAuftragMitarbeiter/${this.produktionslinienDaten}`,daten)
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);
+        this.aktualisiereSeite();
       },
       error: (error) => {
         this.handleFehlerAntwort(error);
@@ -320,12 +379,14 @@ private handleErfolgreicheAntwort(response: any, daten: DataToSend) {
     // Aktualisieren der Projekt-ID für Mitarbeiter
   }
   this.resetInput();
+  this.aktualisiereSeite();
 }
 
 private handleFehlerAntwort(error: any) {
   this.feedbackMessage = 'Fehler beim Speichern der Daten.';
   console.error('Fehler beim Senden der Daten:', error);
   this.resetInput();
+  this.aktualisiereSeite();
 }
 
 private resetInput() {
@@ -336,7 +397,7 @@ private resetInput() {
 
   private sendRequestToBackend(mitarbeiterName: string) {
     // URL des Endpunkts mit Einbeziehung der produktionslinienDaten
-    const url = `http://localhost:3002/checkMitarbeiter/${this.produktionslinienDaten}`;
+    const url = `http://192.168.100.1:3002/checkMitarbeiter/${this.produktionslinienDaten}`;
 
     // Daten, die im Body der Anfrage gesendet werden
     const dataToSend = {
@@ -357,6 +418,7 @@ private resetInput() {
             throw new Error('Netzwerkantwort war nicht ok');
         }
         return response.json();
+
     })
     .then(data => {
         console.log('Erfolgreich gesendet:', data);
@@ -368,9 +430,9 @@ private resetInput() {
 
 
   async checkAktiverAuftrag(daten: DataToSend): Promise<any> {
-    console.log(daten)
+    //console.log(daten)
     try {
-      const url = 'http://localhost:3002/check-aktiver-auftrag';
+      const url = 'http://192.168.100.1:3002/check-aktiver-auftrag';
   
       let params = new HttpParams();
       if (daten.produktionslinie) {
@@ -378,12 +440,12 @@ private resetInput() {
       }
       if (daten.Auftrag) {
         params = params.set('Auftrag', daten.inputValue);
-        console.log(params)
+       // console.log(params)
       }
   
       // Beachten Sie, dass der Typ hier nicht mehr `boolean` ist, sondern `any` oder ein spezifischer Typ, der Ihrer Antwortstruktur entspricht
       const response = await this.http.get<any>(url, { params }).toPromise();
-      console.log('checkAktiverAuftrag',response)
+      //console.log('checkAktiverAuftrag',response)
       return response;
     } catch (error) {
       console.error('Fehler beim Überprüfen des aktiven Auftrags:', error);
@@ -399,13 +461,14 @@ private resetInput() {
   sollmenge!:string;
   PpArfrag!:string;
   private scanAuftrag(auftragsnummer: string) {
-    this.http.get<any>(`http://localhost:3002/auftrag-details/${auftragsnummer}`)
+    this.http.get<any>(`http://192.168.100.1:3002/auftrag-details/${auftragsnummer}`)
       .subscribe({
         next: (response) => {
           this.PpArfrag=response.auftragsDetails.auftragsnr;
            this.Bezeichnung=response.auftragsDetails.fpbezeichnung;
           this.sollmenge=response.auftragsDetails.sollmenge;
-          console.log('auftrag-details',response)
+         // console.log('auftrag-details',response)
+        
           
         },
         error: (error) => {

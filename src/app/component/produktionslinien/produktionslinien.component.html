@@ -39,7 +39,7 @@
           <span class="status-punkt" [ngClass]="{
             'status-gruen': mitarbeiter.status === 'Produktionszeit' || mitarbeiter.status === 'Rüstzeit' ,
             'status-gelb': mitarbeiter.status === 'Wartezeit',
-            'status-rot': mitarbeiter.status === 'abgemeldet'
+            'status-rot': mitarbeiter.status === 'Abgemeldet'
           }">•</span>
           {{ mitarbeiter.name }} - {{ mitarbeiter.status }}
       

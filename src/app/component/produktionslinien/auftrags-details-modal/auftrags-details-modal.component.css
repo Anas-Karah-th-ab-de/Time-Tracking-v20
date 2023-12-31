@@ -14,9 +14,10 @@
   
   mat-dialog-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between; /* Stellt sicher, dass die Buttons am jeweiligen Ende des Containers positioniert werden */
     padding-top: 20px;
   }
+  
   
   button[mat-button] {
     min-width: 90px;

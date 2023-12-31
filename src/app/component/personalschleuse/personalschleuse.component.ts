@@ -65,7 +65,7 @@ export class PersonalschleuseComponent implements OnInit {
       const mitarbeiterName = nameTeil[1].trim();
       console.log(mitarbeiterName);
       // Senden der Anfrage an das Backend
-      this.http.post<any>('http://localhost:3002/api/abmeldung', { mitarbeiterName }).subscribe(response => {
+      this.http.post<any>('http://192.168.100.1:3002/api/abmeldung', { mitarbeiterName }).subscribe(response => {
         // Verarbeiten der Antwort
         this.abgemeldeterMitarbeiter = response.mitarbeiterName;
         this.abmeldezeit = new Date(response.abmeldezeit);

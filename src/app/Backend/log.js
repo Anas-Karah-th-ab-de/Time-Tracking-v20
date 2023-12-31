@@ -8,7 +8,7 @@ const User  = require('../model/user');
 
 app.use(cors({
     origin: function (origin, callback) {
-      const allowedOrigins = ['http://192.168.100.1:80', 'http://localhost:4200', 'http://192.168.100.1','*'];
+      const allowedOrigins = ['http://192.168.100.1:83', 'http://localhost:4200', 'http://192.168.100.1','*'];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -323,6 +323,52 @@ const abmeldeMitarbeiterVonAllenProjekten = async (mitarbeiterName) => {
     throw error;
   }
 };
+
+
+const abmeldeMitarbeiterVonAllenProjektenohneende = async (mitarbeiterName) => {
+  try {
+    // Suche in allen aktiven Projekten
+    const aktiveProjekte = await Projekt.find({ aktiv: true });
+
+    for (let projekt of aktiveProjekte) {
+      const mitarbeiterIndex = projekt.mitarbeiter.findIndex(m => m.name === mitarbeiterName);
+      if (mitarbeiterIndex !== -1) {
+        const mitarbeiter = projekt.mitarbeiter[mitarbeiterIndex];
+        const aktuellesDatum = new Date();
+
+        ['Produktionszeit', 'Ruestzeit', 'Wartezeit'].forEach(aktivitaet => {
+          if (mitarbeiter[aktivitaet] && mitarbeiter[aktivitaet].length > 0) {
+            let offenesIntervall = mitarbeiter[aktivitaet].find(intervall => !intervall.ende);
+            if (offenesIntervall) {
+              offenesIntervall.ende = aktuellesDatum;
+              offenesIntervall.dauer = Math.round((aktuellesDatum.getTime() - new Date(offenesIntervall.start).getTime()) / 60000);            }
+          }
+        });
+
+        try {
+          await projekt.save();
+        
+        } catch (error) {
+          if (error instanceof mongoose.Error.VersionError) {
+            // Projekt neu laden und erneut versuchen
+            const frischesProjekt = await Projekt.findById(projekt._id);
+            if (!frischesProjekt) {
+              console.log('Projekt nicht mehr vorhanden');
+              continue; // Zum nächsten Projekt gehen
+            }
+            // Änderungen erneut anwenden
+            // ...
+            await frischesProjekt.save();
+          } else {
+            throw error;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    throw error;
+  }
+};
 const sindAlleMitarbeiterAbgemeldet = (projekt) => {
   for (let mitarbeiter of projekt.mitarbeiter) {
     if (mitarbeiter.Produktionszeit.some(zeitIntervall => !zeitIntervall.ende) ||
@@ -366,7 +412,7 @@ async function wechselAktivitaet(produktionslinie, mitarbeiterName, neueAktivita
       return;
     }
 
-    await abmeldeMitarbeiterVonAllenProjekten( mitarbeiterName);
+    await abmeldeMitarbeiterVonAllenProjektenohneende( mitarbeiterName);
 
     const jetzt = new Date();
     let neuesIntervall = {
@@ -547,7 +593,7 @@ app.post('/neuerAuftragMitarbeiter/:produktionslinie', async (req, res) => {
 });
 
 //bearbeiten
-app.get('/api/vorletztes-nicht-aktives-projekt', async (req, res) => {
+/*app.get('/api/vorletztes-nicht-aktives-projekt', async (req, res) => {
   try {
     const { produktionslinie, auftrag } = req.query;
 
@@ -566,6 +612,35 @@ app.get('/api/vorletztes-nicht-aktives-projekt', async (req, res) => {
     const vorletztesProjekt = projekte[1];
 
     res.status(200).json(vorletztesProjekt);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Fehler beim Abrufen des Projekts');
+  }
+});*/
+
+
+app.get('/api/vorletztes-nicht-aktives-projekt', async (req, res) => {
+  try {
+    const { produktionslinie, auftrag } = req.query;
+console.log(produktionslinie, auftrag)
+    // Überprüfen, ob notwendige Parameter vorhanden sind
+    if (!produktionslinie || !auftrag) {
+      return res.status(400).send('Fehlende Parameter');
+    }
+
+    // Finden Sie das letzte nicht aktive Projekt, das Palettendaten enthält
+    const projekt = await Projekt.findOne({
+      produktionslinie: produktionslinie,
+      Auftrag: auftrag,
+      aktiv: false,
+      palettenDaten: { $exists: true, $ne: {} } // Stellen Sie sicher, dass palettenDaten existiert und nicht leer ist
+    }).sort({ startzeit: -1 }); // Sortieren nach Startzeit in absteigender Reihenfolge
+
+    if (!projekt) {
+      return res.status(404).send('Kein passendes Projekt gefunden');
+    }
+
+    res.status(200).json(projekt);
   } catch (err) {
     console.error(err);
     res.status(500).send('Fehler beim Abrufen des Projekts');

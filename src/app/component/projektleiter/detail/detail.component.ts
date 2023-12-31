@@ -53,34 +53,35 @@ letzteProjekt: any;
       const auftrag = params['auftrag'];
       const datum = params['datum'];
       console.log(produktionslinie, auftrag, datum);
-
+  
       // Abrufen des Projekts vom Server
       this.http.get('http://localhost:3002/projekt', { params: { produktionslinie, auftrag, datum } })
         .subscribe(projekt => {
           this.aktuellesProjekt = projekt;
-          this.mitarbeiterDaten= this.aktuellesProjekt.mitarbeiter;
-          this.formVollePaletten=this.aktuellesProjekt.palettenDaten.
-          vollePaletten;
-          this.formRestPaletten=this.aktuellesProjekt.palettenDaten.
-          restPaletten;
-          this.formGesamt=this.aktuellesProjekt.palettenDaten.
-          gesamtDaten;
+  
+          if (this.aktuellesProjekt && this.aktuellesProjekt.palettenDaten) {
+            this.mitarbeiterDaten = this.aktuellesProjekt.mitarbeiter;
+            this.formVollePaletten = this.aktuellesProjekt.palettenDaten.vollePaletten;
+            this.formRestPaletten = this.aktuellesProjekt.palettenDaten.restPaletten;
+            this.formGesamt = this.aktuellesProjekt.palettenDaten.gesamtDaten;
+          }
         });
-        this.http.get('http://localhost:3002/api/vorletztes-nicht-aktives-projekt', { params: { produktionslinie, auftrag } })
+  
+      this.http.get('http://localhost:3002/api/vorletztes-nicht-aktives-projekt', { params: { produktionslinie, auftrag } })
         .subscribe(projekt => {
           this.letzteProjekt = projekt;
-          this.letzteformVollePaletten=this.letzteProjekt.palettenDaten.
-          vollePaletten;
-          this.letzteformRestPaletten=this.letzteProjekt.palettenDaten.
-          restPaletten;
-          this.letzteformGesamt=this.letzteProjekt.palettenDaten.
-          gesamtDaten;
-         
-         console.log( projekt)
+  
+          if (this.letzteProjekt && this.letzteProjekt.palettenDaten) {
+            this.letzteformVollePaletten = this.letzteProjekt.palettenDaten.vollePaletten;
+            this.letzteformRestPaletten = this.letzteProjekt.palettenDaten.restPaletten;
+            this.letzteformGesamt = this.letzteProjekt.palettenDaten.gesamtDaten;
+          }
+  
+          console.log(projekt);
         });
     });
-   
   }
+  
   private _produktionslinie = '';
 
   get produktionslinie(): string {
