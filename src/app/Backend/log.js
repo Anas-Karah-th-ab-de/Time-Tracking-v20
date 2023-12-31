@@ -297,6 +297,11 @@ const abmeldeMitarbeiterVonAllenProjekten = async (mitarbeiterName) => {
 
         try {
           await projekt.save();
+          if (sindAlleMitarbeiterAbgemeldet(projekt)) {
+            projekt.aktiv = false;
+            projekt.endzeit = new Date();
+            await projekt.save();
+          }
         } catch (error) {
           if (error instanceof mongoose.Error.VersionError) {
             // Projekt neu laden und erneut versuchen
@@ -317,6 +322,16 @@ const abmeldeMitarbeiterVonAllenProjekten = async (mitarbeiterName) => {
   } catch (error) {
     throw error;
   }
+};
+const sindAlleMitarbeiterAbgemeldet = (projekt) => {
+  for (let mitarbeiter of projekt.mitarbeiter) {
+    if (mitarbeiter.Produktionszeit.some(zeitIntervall => !zeitIntervall.ende) ||
+        mitarbeiter.Ruestzeit.some(zeitIntervall => !zeitIntervall.ende) ||
+        mitarbeiter.Wartezeit.some(zeitIntervall => !zeitIntervall.ende)) {
+      return false;
+    }
+  }
+  return true;
 };
 app.post('/api/abmeldung', async (req, res) => {
   try {
