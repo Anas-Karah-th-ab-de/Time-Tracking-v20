@@ -1,0 +1,1 @@
+Es trat ein Fehler auf: error: kein pg_hba.conf-Eintrag f�r Host �10.242.2.2�, Benutzer �postgres�, Datenbank �25034PP�, SSL aus

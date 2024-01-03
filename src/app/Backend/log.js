@@ -484,6 +484,7 @@ app.post('/checkMitarbeiter/:produktionslinie', async (req, res) => {
         res.json({ message: 'Keine Änderung durchgeführt' });
       } else {
           // Fügen Sie den neuen Eintrag zum entsprechenden Status hinzu
+          await abmeldeMitarbeiterVonAllenProjekten(mitarbeiter);
           const höchsteNummer = mitarbeiter[status].reduce((max, eintrag) => eintrag.nummer > max ? eintrag.nummer : max, 0);
           const neueNummer = höchsteNummer + 1;
       
@@ -492,6 +493,7 @@ app.post('/checkMitarbeiter/:produktionslinie', async (req, res) => {
      
           
           console.log(mitarbeiter)
+          
           await projekt.save();
           res.json({ message: 'Mitarbeiter erneuet angemeldet' });
       }
@@ -687,6 +689,9 @@ console.log(req.body)
   }
 });
 
-app.listen(3002, () => {
-    console.log('Server läuft auf http://localhost:3002');
+
+
+const port = 3002;
+app.listen(port, '192.168.100.1', () => {
+  console.log(`Server is running on http://192.168.100.1:${port}`);
 });

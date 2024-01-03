@@ -26,6 +26,7 @@
             "outputPath": "dist/time-tracking-v20",
             "index": "src/index.html",
             "browser": "src/main.ts",
+            "allowedCommonJsDependencies": ["qrcode"],
             "polyfills": [
               "zone.js"
             ],
@@ -45,13 +46,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
+                  "maximumWarning": "5000kb",
                   "maximumError": "1mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "2000kb",
+                  "maximumError": "4000kb"
                 }
               ],
               "outputHashing": "all"

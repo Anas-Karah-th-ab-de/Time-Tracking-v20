@@ -55,27 +55,28 @@ letzteProjekt: any;
       console.log(produktionslinie, auftrag, datum);
   
       // Abrufen des Projekts vom Server
-      this.http.get('http://localhost:3002/projekt', { params: { produktionslinie, auftrag, datum } })
+      this.http.get('http://192.168.100.1:3002/projekt', { params: { produktionslinie, auftrag, datum } })
         .subscribe(projekt => {
           this.aktuellesProjekt = projekt;
-  
-          if (this.aktuellesProjekt && this.aktuellesProjekt.palettenDaten) {
+          console.log(projekt);
+         
             this.mitarbeiterDaten = this.aktuellesProjekt.mitarbeiter;
+            console.log('werwer',this.mitarbeiterDaten);
             this.formVollePaletten = this.aktuellesProjekt.palettenDaten.vollePaletten;
             this.formRestPaletten = this.aktuellesProjekt.palettenDaten.restPaletten;
             this.formGesamt = this.aktuellesProjekt.palettenDaten.gesamtDaten;
-          }
+          
         });
   
-      this.http.get('http://localhost:3002/api/vorletztes-nicht-aktives-projekt', { params: { produktionslinie, auftrag } })
+      this.http.get('http://192.168.100.1:3002/api/vorletztes-nicht-aktives-projekt', { params: { produktionslinie, auftrag } })
         .subscribe(projekt => {
           this.letzteProjekt = projekt;
   
-          if (this.letzteProjekt && this.letzteProjekt.palettenDaten) {
+          
             this.letzteformVollePaletten = this.letzteProjekt.palettenDaten.vollePaletten;
             this.letzteformRestPaletten = this.letzteProjekt.palettenDaten.restPaletten;
             this.letzteformGesamt = this.letzteProjekt.palettenDaten.gesamtDaten;
-          }
+          
   
           console.log(projekt);
         });
@@ -226,7 +227,7 @@ this.formRestPaletten.kartons= (this.formRestPaletten.gesamtmenge -this.formRest
   
 // Angular Service-Methode zum Aktualisieren eines Projekts
 updateProject(projektId: string, projektDaten: any): Observable<any> {
-  return this.http.put(`http://localhost:3002/projekt/${projektId}`, projektDaten);
+  return this.http.put(`http://192.168.100.1:3002/projekt/${projektId}`, projektDaten);
 }
 
   validateFormData() {

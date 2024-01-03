@@ -161,7 +161,7 @@ export class ProduktionslinienComponent implements AfterViewInit {
     this.initFocusOnInputField();
     this.cdr.detectChanges();
     setInterval(() => this.updateDateTime(), 1000);
-    setInterval(() =>  this.ladeAktivesProjekt(), 6000);
+    //setInterval(() =>  this.ladeAktivesProjekt(), 6000);
  
   }
   initFocusOnInputField() {
@@ -270,7 +270,7 @@ private bestimmeDatentyp(inputValue: string): string {
   if (inputValue.startsWith('Pr.')) return 'Auftrag';
   else{
     this.resetInput();
-    this.aktualisiereSeite();
+    //this.aktualisiereSeite();
     return 'Unbekannt'};
 }
 
@@ -286,7 +286,7 @@ private verarbeiteMitarbeiterDaten(daten: DataToSend, inputValue: string) {
   if (mitarbeiterExistiert) {
     this.sendRequestToBackend(mitarbeiterName);
     this.resetInput();
-    this.aktualisiereSeite();
+    //this.aktualisiereSeite();
   }if (!mitarbeiterExistiert){
     this.aktiveMitarbeiter.push({
       name: mitarbeiterName,
@@ -301,7 +301,7 @@ private verarbeiteMitarbeiterDaten(daten: DataToSend, inputValue: string) {
     
     this.sendRequest(daten);
     this.resetInput();
-    this.aktualisiereSeite();
+    //this.aktualisiereSeite();
   }
 }
 
@@ -329,7 +329,9 @@ private prüfeAktivenAuftrag(daten: DataToSend) {
           // Nur senden, wenn der Benutzer im Dialog "Bestätigen" wählt
           this.neueauftrag(daten);
           this.scanAuftrag(daten.inputValue);
+          this.resetInput();
         }
+        else{this.resetInput();}
       });
     } else {
       // Wenn kein aktiver Auftrag existiert, senden Sie die Anfrage direkt
@@ -347,7 +349,7 @@ private sendRequest(daten: DataToSend) {
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);
-        this.aktualisiereSeite();
+        //this.aktualisiereSeite();
       },
       error: (error) => {
         this.handleFehlerAntwort(error);
@@ -364,7 +366,7 @@ private neueauftrag(daten: DataToSend) {
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);
-        this.aktualisiereSeite();
+        //this.aktualisiereSeite();
       },
       error: (error) => {
         this.handleFehlerAntwort(error);
@@ -379,14 +381,14 @@ private handleErfolgreicheAntwort(response: any, daten: DataToSend) {
     // Aktualisieren der Projekt-ID für Mitarbeiter
   }
   this.resetInput();
-  this.aktualisiereSeite();
+  //this.aktualisiereSeite();
 }
 
 private handleFehlerAntwort(error: any) {
   this.feedbackMessage = 'Fehler beim Speichern der Daten.';
   console.error('Fehler beim Senden der Daten:', error);
   this.resetInput();
-  this.aktualisiereSeite();
+  //this.aktualisiereSeite();
 }
 
 private resetInput() {

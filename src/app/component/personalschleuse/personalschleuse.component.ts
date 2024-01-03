@@ -17,7 +17,7 @@ export class PersonalschleuseComponent implements OnInit {
   abmeldezeitde!: string;
   aktuelleZeit: string = '';
 
-  constructor(private http: HttpClient) { interval(1000).subscribe(() => {
+  constructor(private http: HttpClient) { interval(500).subscribe(() => {
     this.aktuelleZeit = new Date().toLocaleString('de-DE', {
       year: 'numeric',
       month: '2-digit',
@@ -32,7 +32,7 @@ export class PersonalschleuseComponent implements OnInit {
   ngOnInit() {
     this.setFocusOnInput();
     this.qrCodeInputSubject.pipe(
-      debounceTime(1000) // Warten auf 1 Sekunde der Inaktivität
+      debounceTime(500) // Warten auf 1 Sekunde der Inaktivität
     ).subscribe(qrCode => {
       this.handleQrCodeInput(qrCode);
     });
@@ -83,7 +83,7 @@ export class PersonalschleuseComponent implements OnInit {
           this.showAbmeldung = false;
           this.qrCodeInput.nativeElement.value = '';
           this.qrCodeInput.nativeElement.focus();
-        }, 5000); // Anzeige für 5 Sekunden
+        }, 500); // Anzeige für 5 Sekunden
       }, error => {
         console.error('Fehler bei der Abmeldung', error);
         this.qrCodeInput.nativeElement.value = '';
