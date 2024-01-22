@@ -727,6 +727,6 @@ app.get('/projekt/bricht', async (req, res) => {
 
 
 const port = 3002;
-app.listen(port, '192.168.100.1', () => {
-  console.log(`Server is running on http://192.168.100.1:${port}`);
+app.listen(port, '-', () => {
+  console.log(`Server is running on http://-:${port}`);
 });
