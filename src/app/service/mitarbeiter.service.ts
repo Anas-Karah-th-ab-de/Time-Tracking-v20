@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root' // oder 'MitarbeiterService' wird in einem spezifischen Modul bereitgestellt
 })
 export class MitarbeiterService {
-  private apiUrl = 'http://kmapp.prestigepromotion.de:3001/mitarbeiter';
+  private apiUrl = 'http://-:3001/mitarbeiter';
 
   constructor(private http: HttpClient) { }
 
