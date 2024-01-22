@@ -8,7 +8,7 @@ const User  = require('../model/user');
 
 app.use(cors({
     origin: function (origin, callback) {
-      const allowedOrigins = ['http://192.168.100.1:83', 'http://localhost:4200', 'http://192.168.100.1','*'];
+      const allowedOrigins = ['-'];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -19,7 +19,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 
-mongoose.connect('mongodb://kmapp.prestigepromotion.de:27017/time-tracking')
+mongoose.connect('mongodb:/-/time-tracking')
   .then(() => console.log('MongoDB verbunden...'))
   .catch(err => console.error('MongoDB Verbindungsfehler:', err));
   const auftragDbConnection = mongoose.createConnection('mongodb://localhost:27017/auftragDB', );
