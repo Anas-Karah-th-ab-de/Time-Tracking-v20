@@ -14,7 +14,7 @@ export class ProjektleiterComponent implements OnInit {
   gefilterteProjekte: any[] = [];
   filterText: string = '';
   ausgewaehltesProjekt: any = null;
-  private baseUrl = 'http://kmapp.prestigepromotion.de:3002';
+  private baseUrl = '-:3002';
   aktuellesDatum: string;
   constructor(private router: Router,private route: ActivatedRoute,private http: HttpClient) {
     const heute = new Date();
