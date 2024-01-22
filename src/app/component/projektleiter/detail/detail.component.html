@@ -29,6 +29,7 @@
       <div><strong>Muster PP:</strong> <span>{{ letzteformGesamt.musterPP }}</span></div>
       <div><strong>Gesamtmenge:</strong> <span>{{ letzteformGesamt.gesamtmenge }}</span></div>
       <div><strong>Ausschuss:</strong> <span>{{ letzteformGesamt.ausschuss }}</span></div>
+      <div><strong>Sume der Ausschuss:</strong> <span>{{ letzteformGesamt.sumAusschusse }}</span></div>
     </div>
   </div>
 </div>
@@ -155,7 +156,7 @@
         </tr>
         <tr *ngIf="editMode">
           <td>
-            {{ formGesamt.gesamtmenge }}
+            {{ formGesamt.liefermenge }}
           </td>
           <td>
             <input id="gesamtMusterKunde" type="number" [(ngModel)]="formGesamt.musterKunde"

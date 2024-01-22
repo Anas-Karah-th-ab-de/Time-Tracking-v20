@@ -19,7 +19,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 
-mongoose.connect('mongodb://localhost:27017/time-tracking')
+mongoose.connect('mongodb://kmapp.prestigepromotion.de:27017/time-tracking')
   .then(() => console.log('MongoDB verbunden...'))
   .catch(err => console.error('MongoDB Verbindungsfehler:', err));
   const auftragDbConnection = mongoose.createConnection('mongodb://localhost:27017/auftragDB', );
@@ -356,8 +356,7 @@ const abmeldeMitarbeiterVonAllenProjektenohneende = async (mitarbeiterName) => {
               console.log('Projekt nicht mehr vorhanden');
               continue; // Zum nächsten Projekt gehen
             }
-            // Änderungen erneut anwenden
-            // ...
+
             await frischesProjekt.save();
           } else {
             throw error;
@@ -686,6 +685,42 @@ console.log(req.body)
   } catch (err) {
     console.error(err);
     res.status(500).send('Fehler beim Aktualisieren des Projekts');
+  }
+});
+
+//Bricht
+app.get('/projekt/bricht', async (req, res) => {
+  try {
+    let { startDatum, endDatum, aktivStatus } = req.query;
+    
+    // Konvertieren Sie aktivStatus in einen Boolean
+    const aktiv = aktivStatus === 'true';
+
+    // Konvertierung der Datumswerte in Date-Objekte
+    startDatum = new Date(startDatum);
+    endDatum = new Date(endDatum);
+    console.log('Startdatum:', startDatum);
+    console.log('Enddatum:', endDatum);
+    console.log('Aktivstatus:', aktiv);
+    
+    // Überprüfen Sie, ob die Daten gültig sind
+    if (isNaN(startDatum.valueOf()) || isNaN(endDatum.valueOf())) {
+      return res.status(400).send('Ungültiges Datum.');
+    }
+
+    const projekte = await Projekt.find({
+      startzeit: { $gte: startDatum, $lte: endDatum },
+      aktiv: false
+    })
+//console.log(projekte)
+    if (!projekte) {
+      return res.status(404).send('Keine Projekte gefunden.');
+    }
+
+    res.json(projekte);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Serverfehler');
   }
 });
 

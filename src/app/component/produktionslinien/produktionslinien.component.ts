@@ -142,7 +142,7 @@ export class ProduktionslinienComponent implements AfterViewInit {
       // Update the status locally
 //console.log(this.produktionslinienDaten)
       // Send request to backend to update the status
-      this.http.put(`http://192.168.100.1:3002/aktualisiereStatus/${this.produktionslinienDaten}`, {
+      this.http.put(`http://kmapp.prestigepromotion.de:3002/aktualisiereStatus/${this.produktionslinienDaten}`, {
         mitarbeiterName: mitarbeiter.name,
         neueAktivitaet: mitarbeiter.status
       }).subscribe({
@@ -170,7 +170,7 @@ export class ProduktionslinienComponent implements AfterViewInit {
     });
   }
   private ladeAktivesProjekt() {
-    this.http.get<any>(`http://192.168.100.1:3002/aktives-projekt/${this.produktionslinienDaten}`).subscribe(projekt => {
+    this.http.get<any>(`http://kmapp.prestigepromotion.de:3002/aktives-projekt/${this.produktionslinienDaten}`).subscribe(projekt => {
       if (projekt) {
         this.PpArfrag = projekt.Auftrag;
         this.Bezeichnung = 'Produktbezeichnung'; // Fügen Sie Logik hinzu, um diese Daten zu erhalten
@@ -345,7 +345,7 @@ private prüfeAktivenAuftrag(daten: DataToSend) {
 }
 
 private sendRequest(daten: DataToSend) {
-  this.http.post('http://192.168.100.1:3002/data', daten)
+  this.http.post('http://kmapp.prestigepromotion.de:3002/data', daten)
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);
@@ -362,7 +362,7 @@ private aktualisiereSeite() {
   // um bestimmte Teile der Seite zu aktualisieren, anstatt die ganze Seite neu zu laden.
 }
 private neueauftrag(daten: DataToSend) {
-  this.http.post(`http://192.168.100.1:3002/neuerAuftragMitarbeiter/${this.produktionslinienDaten}`,daten)
+  this.http.post(`http://kmapp.prestigepromotion.de:3002/neuerAuftragMitarbeiter/${this.produktionslinienDaten}`,daten)
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);
@@ -399,7 +399,7 @@ private resetInput() {
 
   private sendRequestToBackend(mitarbeiterName: string) {
     // URL des Endpunkts mit Einbeziehung der produktionslinienDaten
-    const url = `http://192.168.100.1:3002/checkMitarbeiter/${this.produktionslinienDaten}`;
+    const url = `http://kmapp.prestigepromotion.de:3002/checkMitarbeiter/${this.produktionslinienDaten}`;
 
     // Daten, die im Body der Anfrage gesendet werden
     const dataToSend = {
@@ -434,7 +434,7 @@ private resetInput() {
   async checkAktiverAuftrag(daten: DataToSend): Promise<any> {
     //console.log(daten)
     try {
-      const url = 'http://192.168.100.1:3002/check-aktiver-auftrag';
+      const url = 'http://kmapp.prestigepromotion.de:3002/check-aktiver-auftrag';
   
       let params = new HttpParams();
       if (daten.produktionslinie) {
@@ -463,7 +463,7 @@ private resetInput() {
   sollmenge!:string;
   PpArfrag!:string;
   private scanAuftrag(auftragsnummer: string) {
-    this.http.get<any>(`http://192.168.100.1:3002/auftrag-details/${auftragsnummer}`)
+    this.http.get<any>(`http://kmapp.prestigepromotion.de:3002/auftrag-details/${auftragsnummer}`)
       .subscribe({
         next: (response) => {
           this.PpArfrag=response.auftragsDetails.auftragsnr;

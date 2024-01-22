@@ -27,7 +27,10 @@ import { MitarbeiterListeComponent } from './component/mitarbeiter-liste/mitarbe
 import { MitarbeiterErstellenComponent } from './component/mitarbeiter-erstellen/mitarbeiter-erstellen.component';
 import { MitarbeiterDetailComponent } from './component/mitarbeiter-detail/mitarbeiter-detail.component';
 import { QrCodeDialogComponent } from './component/qr-code-dialog/qr-code-dialog.component';
-
+import { BrichtComponent } from './component/bricht/bricht.component';
+import { TagesberichtComponent } from './component/bricht/tagesbericht/tagesbericht.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { GrafikComponent } from './component/Bricht/tagesbericht/grafik/grafik.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -42,9 +45,13 @@ import { QrCodeDialogComponent } from './component/qr-code-dialog/qr-code-dialog
     MitarbeiterListeComponent,
     MitarbeiterErstellenComponent,
     MitarbeiterDetailComponent,
-    QrCodeDialogComponent
+    QrCodeDialogComponent,
+    BrichtComponent,
+    TagesberichtComponent,
+    GrafikComponent
   ],
   imports: [
+    ReactiveFormsModule,
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,

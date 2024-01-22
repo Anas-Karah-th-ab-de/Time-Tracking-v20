@@ -29,7 +29,7 @@ export class LoginComponent {
   }
 
   login() {
-    this.http.post<LoginResponse>('http://192.168.100.1:3002/login', { username: this.userInput })
+    this.http.post<LoginResponse>('http://kmapp.prestigepromotion.de:3002/login', { username: this.userInput })
       .subscribe(response => {
         console.log(response);
         // Überprüfen Sie, ob das user-Objekt vorhanden ist

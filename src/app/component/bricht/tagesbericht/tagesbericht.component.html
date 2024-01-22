@@ -1,0 +1,128 @@
+<div class="tagesbericht">
+  <!-- Formular... -->
+  <form [formGroup]="datumForm" (ngSubmit)="datenAbrufen()" class="form-inline">
+    <div class="form-group">
+      <label for="startDatum">Startdatum:</label>
+      <input type="date" formControlName="startDatum">
+    </div>
+  
+    <div class="form-group">
+      <label for="endDatum">Enddatum:</label>
+      <input type="date" formControlName="endDatum">
+    </div>
+    
+    <div class="form-group">
+      <label>
+        <input type="checkbox" formControlName="aktivStatus">
+        Aktivstatus
+      </label>
+    <!--  <button type="button" (click)="toggleAnsicht()" [ngClass]="{'zusammenfassen': datenZusammengefasst, 'btn-toggle': true}" class="btn-toggle">{{ ansichtButtonLabel }}</button>-->
+    
+    </div>
+  
+    <button type="submit" class="btn">Daten abrufen</button>
+  </form>
+  
+
+  <!-- Tabelle und Grafik Container -->
+  <div class="tabelle-und-grafik">
+    <!-- Tabelle für die Auftragsdaten -->
+    <div class="tabelle">
+      <table>
+        <thead>
+          <tr>
+            <th>Auftragsnummer</th>
+            <th>Startdatum</th>
+            <th>Stückanzahl</th>
+            <th>Dauer</th>
+            <th>Gesamtstückanzahl</th>
+            <th>Gesamtdauer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let auftrag of produktionsDaten; let i = index">
+            <!-- Hauptzeile für jeden Auftrag -->
+            <tr (click)="geoeffneterIndex = geoeffneterIndex === i ? null : i">
+              
+              <td>{{ auftrag.Auftrag }}</td>
+              <td>{{ auftrag.startzeit | date: 'dd.MM.yyyy HH:mm:ss' }}</td>
+              <td>{{ auftrag.gesamtStueckanzahl }}</td>
+              <td>{{ auftrag.gesamtDauer }} Min</td>
+              <td>{{ gesamtDatenProAuftrag[auftrag.Auftrag].gesamtStueckzahl || auftrag.gesamtStueckanzahl }}</td>
+              <td>{{ gesamtDatenProAuftrag[auftrag.Auftrag].gesamtDauer || auftrag.gesamtDauer }} Min</td>
+              
+            </tr>
+            
+            <tr *ngIf="geoeffneterIndex === i" class="details-container">
+              <td colspan="6">
+                <!-- Hier fügen Sie die Details für jeden Auftrag ein -->
+                <div>
+                  <p> <strong style=" font-size: 1em; color: #000;">Produktionslinie:</strong>
+                  {{ auftrag.produktionslinie }} </p>
+                  <div class="palettendaten-container">
+                    <h3>Palettendaten</h3>
+                    <div class="palettendaten-detail">
+                      <div>
+                        <strong>Volle Paletten:</strong>
+                        <p>{{ auftrag.palettenDaten.vollePaletten.paletten }} Paletten, {{ auftrag.palettenDaten.vollePaletten.kartons }} Kartons, Gesamt: {{ auftrag.palettenDaten.vollePaletten.gesamtmenge }}</p>
+                      </div>
+                      <div>
+                        <strong>Restpaletten:</strong>
+                        <p>{{ auftrag.palettenDaten.restPaletten.paletten }} Paletten, {{ auftrag.palettenDaten.restPaletten.kartons }} Kartons, Rest: {{ auftrag.palettenDaten.restPaletten.stueckRestkarton }}, Gesamt: {{ auftrag.palettenDaten.restPaletten.gesamtmenge }}</p>
+                      </div>
+                      <div>
+                        <strong>Gesamtdaten:</strong>
+                        <p>Liefermenge: {{ auftrag.palettenDaten.gesamtDaten.liefermenge }}, Muster Kunde: {{ auftrag.palettenDaten.gesamtDaten.musterKunde }}, Muster PP: {{ auftrag.palettenDaten.gesamtDaten.musterPP }}, Gesamtmenge: {{ auftrag.palettenDaten.gesamtDaten.gesamtmenge }}</p>
+                      </div>
+                    </div> </div>
+               <h3>Mitarbeiterdaten</h3>
+                  <table>
+                    <tr>
+                      <th>Name</th>
+                      <th *ngFor="let mitarbeiter of auftrag.mitarbeiter">{{ mitarbeiter.name }}</th>
+                
+                    </tr>
+                    <tr>
+                      <td>Stückzahl</td>
+                      <td *ngFor="let mitarbeiter of auftrag.mitarbeiter">
+                        {{ mitarbeiter.stueckanzahl }}
+                      </td>
+                    
+                    </tr>
+                  </table>
+                  
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+      
+    </div>
+
+    <!-- Grafikbereich -->
+    <div class="grafik">
+      <canvas id="meineGrafik"></canvas>
+      
+      <div *ngIf="gesamtProduktionszeit !== null">
+        <p>Gesamtproduktionszeit: {{ gesamtProduktionszeit }} Min</p>
+      </div>
+      
+      <div *ngIf="gesamtDurchschnitt !== null">
+        <p>Gesamtdurchschnitt der Produktionszeit: {{ gesamtDurchschnitt }}</p>
+      </div>
+      <canvas id="gesammelteDatenGrafik"></canvas>
+
+    </div>
+    
+  </div>
+
+  <!-- Fußzeile mit Gesamtinformationen -->
+  <footer>
+    <p>Anzahl der Aufträge: {{ anzahlAuftraege }}</p>
+    <p>Gesamtsumme der Dauer aller Aufträge: {{ gesamtDauerAllerAuftraege }} Min</p>
+    <button (click)="downloadAsPDF()" style=" background-color: #8f1505">Als PDF herunterladen</button>
+    <button (click)="downloadAsExcel()">Als Excel herunterladen</button>
+
+  </footer>
+</div>

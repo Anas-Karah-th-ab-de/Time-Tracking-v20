@@ -55,7 +55,7 @@ letzteProjekt: any;
       console.log(produktionslinie, auftrag, datum);
   
       // Abrufen des Projekts vom Server
-      this.http.get('http://192.168.100.1:3002/projekt', { params: { produktionslinie, auftrag, datum } })
+      this.http.get('http://kmapp.prestigepromotion.de:3002/projekt', { params: { produktionslinie, auftrag, datum } })
         .subscribe(projekt => {
           this.aktuellesProjekt = projekt;
           console.log(projekt);
@@ -68,7 +68,7 @@ letzteProjekt: any;
           
         });
   
-      this.http.get('http://192.168.100.1:3002/api/vorletztes-nicht-aktives-projekt', { params: { produktionslinie, auftrag } })
+      this.http.get('http://kmapp.prestigepromotion.de:3002/api/vorletztes-nicht-aktives-projekt', { params: { produktionslinie, auftrag } })
         .subscribe(projekt => {
           this.letzteProjekt = projekt;
   
@@ -105,10 +105,10 @@ letzteProjekt: any;
 
   formVollePaletten = { paletten: 0, kartons: 0, stueckKarton: 0, gesamtmenge: 0 };
   formRestPaletten = { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 };
-  formGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 };
+  formGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 ,sumAusschusse:0};
   letzteformVollePaletten = { paletten: 0, kartons: 0, stueckKarton: 0, gesamtmenge: 0 };
   letzteformRestPaletten = { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 };
-  letzteformGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 };
+  letzteformGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 ,sumAusschusse:0};
 
   vollePalettenBestaetigt = { paletten: false, kartons: false, stueckKarton: false };
   restPalettenBestaetigt = { paletten: false, kartons: false, stueckKarton: false, stueckRestkarton: false };
@@ -144,61 +144,37 @@ letzteProjekt: any;
     });
   }
   
-  bestaetigeVollePaletten() {
-    this.vollePalettenBestaetigt.paletten = true;
-    this.vollePalettenBestaetigt.kartons = true;
-    this.vollePalettenBestaetigt.stueckKarton = true;
-    this.formVollePaletten.gesamtmenge =  ((this.gesamtDatenltzete+this.Gesamtstueckzahlmitarbeiter) % ( this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton));
-    this.formRestPaletten.gesamtmenge= (this.Gesamtstueckzahlmitarbeiter+ this.gesamtDatenltzete)%( this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton)
-    this.formVollePaletten.paletten = Math.ceil(this.formVollePaletten.gesamtmenge / (this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton));
-    
-  // //console.log(this.gesamtDatenltzete,this.Gesamtstueckzahlmitarbeiter,this.formVollePaletten.gesamtmenge, this.formVollePaletten.paletten)
-if (this.formRestPaletten.gesamtmenge > 0) {
-  this.formRestPaletten.paletten = 1;
-} else {
-  this.formRestPaletten.paletten = 0; // Assuming Feld6 is another property you want to set
-}
-this.formRestPaletten.stueckKarton =this.formVollePaletten.stueckKarton
-this.formRestPaletten.stueckRestkarton =this.formRestPaletten.gesamtmenge % this.formVollePaletten.stueckKarton
-this.formRestPaletten.kartons= (this.formRestPaletten.gesamtmenge -this.formRestPaletten.stueckKarton)/this.formVollePaletten.stueckKarton;
-    this.formRestPaletten.gesamtmenge = this.formRestPaletten.paletten * this.formRestPaletten.kartons * this.formRestPaletten.stueckRestkarton;
 
 
-  }
 
-  bestaetigeGesamtDaten() {
-    // //console.log(this.gesammelteMitarbeiter)
-    this.gesamtDatenBestaetigt.liefermenge = true;
-    this.gesamtDatenBestaetigt.musterKunde = true;
-    this.gesamtDatenBestaetigt.musterPP = true;
-    this.gesamtDatenBestaetigt.ausschuss = true; // Ausschuss bestätigen
-    this.gesamtDatenBestaetigt.gesamtDaten = true;
-    this.formGesamt.liefermenge= this.formVollePaletten.paletten+ this.Gesamtstueckzahlmitarbeiter-this.formGesamt.musterKunde-this.formGesamt.musterPP
-    // Berechnung der Gesamtmenge unter Berücksichtigung des Ausschusses
-    this.formGesamt.gesamtmenge = this.Gesamtstueckzahlmitarbeiter + this.gesamtDatenltzete;
-  
-
-  }
+  Menge1vollePalette!:number;
+  sumAusschusse !:number;
   aktualisiereBerechnungen() {
     this.Gesamtstueckzahlmitarbeiter = this.mitarbeiterDaten.reduce((sum, current) => sum + current.stueckanzahl, 0);
+    this.Menge1vollePalette=this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton;
+   
+    this.formGesamt.gesamtmenge = this.Gesamtstueckzahlmitarbeiter + this.gesamtDatenltzete;
+    this.formVollePaletten.paletten = Math.ceil(this.formGesamt.gesamtmenge/ this.Menge1vollePalette) ;
 
-    this.formVollePaletten.gesamtmenge =  ((this.gesamtDatenltzete+this.Gesamtstueckzahlmitarbeiter) % ( this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton));
-  	this.formRestPaletten.gesamtmenge= (this.Gesamtstueckzahlmitarbeiter+ this.gesamtDatenltzete)%((this.Gesamtstueckzahlmitarbeiter+ this.gesamtDatenltzete)-( this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton))
-    this.formVollePaletten.paletten = Math.ceil(this.formVollePaletten.gesamtmenge / (this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton));
+    this.formVollePaletten.gesamtmenge = this.formVollePaletten.paletten *  this.Menge1vollePalette ;
+   
+  	this.formRestPaletten.gesamtmenge= this.formGesamt.gesamtmenge%this.Menge1vollePalette;
   	if (this.formRestPaletten.gesamtmenge > 0) {
   	  this.formRestPaletten.paletten = 1;
   	} else {
   	  this.formRestPaletten.paletten = 0; // Assuming Feld6 is another property you want to set
   	}
-  	this.formRestPaletten.stueckKarton =this.formVollePaletten.stueckKarton
-  	this.formRestPaletten.stueckRestkarton =this.formRestPaletten.gesamtmenge % this.formVollePaletten.stueckKarton
-  	this.formRestPaletten.kartons= (this.formRestPaletten.gesamtmenge -this.formRestPaletten.stueckKarton)/this.formVollePaletten.stueckKarton;
-    this.formRestPaletten.gesamtmenge = this.formRestPaletten.paletten * this.formRestPaletten.kartons * this.formRestPaletten.stueckRestkarton;
-    this.formGesamt.liefermenge= this.formVollePaletten.paletten+ this.Gesamtstueckzahlmitarbeiter-this.formGesamt.musterKunde-this.formGesamt.musterPP
-    // Berechnung der Gesamtmenge unter Berücksichtigung des Ausschusses
-    this.formGesamt.gesamtmenge = this.Gesamtstueckzahlmitarbeiter + this.gesamtDatenltzete;
+  	this.formRestPaletten.stueckKarton =this.formVollePaletten.stueckKarton;
+  	this.formRestPaletten.stueckRestkarton =this.formRestPaletten.gesamtmenge % this.formVollePaletten.stueckKarton;
 
-    
+  	this.formRestPaletten.kartons= (this.formRestPaletten.gesamtmenge- this.formRestPaletten.stueckRestkarton)/this.formVollePaletten.stueckKarton;
+
+    this.formGesamt.liefermenge=   this.formGesamt.gesamtmenge - (this.formGesamt.musterKunde + this.formGesamt.musterPP);
+    console.log( this.formGesamt.liefermenge)
+    console.log(this.formGesamt.musterKunde + this.formGesamt.musterPP)
+    // Berechnung der Gesamtmenge unter Berücksichtigung des Ausschusses
+
+    this.formGesamt.sumAusschusse=this.letzteformGesamt.ausschuss+this.formGesamt.ausschuss;
   }
   
   bestaetigenUndSpeichern(): void {
@@ -227,7 +203,7 @@ this.formRestPaletten.kartons= (this.formRestPaletten.gesamtmenge -this.formRest
   
 // Angular Service-Methode zum Aktualisieren eines Projekts
 updateProject(projektId: string, projektDaten: any): Observable<any> {
-  return this.http.put(`http://192.168.100.1:3002/projekt/${projektId}`, projektDaten);
+  return this.http.put(`http://kmapp.prestigepromotion.de:3002/projekt/${projektId}`, projektDaten);
 }
 
   validateFormData() {

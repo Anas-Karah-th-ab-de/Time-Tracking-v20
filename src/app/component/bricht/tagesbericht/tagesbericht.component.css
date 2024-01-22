@@ -1,0 +1,261 @@
+.tagesbericht {
+  font-family: 'Arial', sans-serif;
+  max-width: 2000px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f8f8f8;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tagesbericht form {
+  margin-bottom: 20px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tagesbericht label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  font-weight: bold;
+}
+
+.tagesbericht input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.tagesbericht input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.tagesbericht button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tagesbericht button:hover {
+  background-color: #0056b3;
+}
+
+.tagesbericht .tabelle-und-grafik {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.tagesbericht .tabelle {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.tagesbericht .grafik {
+  flex: 1;
+}
+
+.tagesbericht table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tagesbericht th, 
+.tagesbericht td {
+  text-align: left;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.tagesbericht th {
+  background-color: #137521;
+  color: white;
+}
+
+.tagesbericht tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.tagesbericht tr:hover {
+  background-color: #ddd;
+}
+
+.tagesbericht footer {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  gap: 15px;
+}
+
+.tagesbericht footer p {
+  margin: 5px 0;
+  font-size: 1.1em;
+  color: #333;
+}
+.tagesbericht footer button {
+  margin: 5px 0;
+  font-size: 1.1em;
+  color: #fcfcfc;
+  gap: 15px;
+  margin-right: 20px;
+  background-color: #137521;
+}
+.tagesbericht footer PDF {
+  margin: 5px 0;
+  font-size: 1.1em;
+  color: #fcfcfc;
+  gap: 15px;
+  margin-right: 20px;
+  background-color: #05458f;
+}
+.toggle-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative; /* To position circles */
+  width: 120px; /* Adjust as needed */
+  height: 60px; /* Adjust as needed */
+  overflow: hidden; /* Hide the parts of circles that overflow */
+}
+
+.circle {
+  width: 80px; /* Adjust as needed */
+  height: 80px; /* Adjust as needed */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.green {
+  background-color: #4CAF50; /* Adjust color as needed */
+  left: 0;
+}
+
+.grey {
+  background-color: #9E9E9E; /* Adjust color as needed */
+  left: 40px; /* Adjust to overlap */
+}
+
+.button-text {
+  color: white; /* Adjust color as needed */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold; /* Adjust as needed */
+  font-size: 14px; /* Adjust as needed */
+}
+.form-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* Erlaubt den Elementen, in die nächste Zeile zu gehen, wenn der Bildschirm schmal ist */
+  gap: 15px; /* Abstand zwischen den Elementen, kann angepasst werden */
+}
+
+.form-group {
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  margin-right: 20px; /* Rechter Abstand für jedes Form-Element, kann angepasst werden */
+}
+
+.form-group label {
+  margin-bottom: 5px; /* Abstand unter dem Label, kann angepasst werden */
+}
+
+.btn {
+ 
+  padding: 5px 15px; /* Anpassung der Button-Größe */
+  cursor: pointer;
+  /* Schiebt den Button nach rechts */
+}
+
+.btn-toggle {
+  padding: 5px 10px;
+  border: 1px solid transparent; /* Optional: Fügt einen transparenten Rand hinzu */
+  border-radius: 20px; /* Abgerundete Ecken */
+  font-weight: bold;
+  color: white; /* Textfarbe */
+  background-color: #dc3545; /* Rote Hintergrundfarbe für den "Details" Modus */
+  margin-top: 10px;
+  transition: background-color 0.3s ease; /* Weiche Übergänge für Farbänderungen */
+}
+
+.btn-toggle.zusammenfassen {
+  background-color: #28a745; /* Grüne Hintergrundfarbe für den "Zusammenfassen" Modus */
+}
+
+/* Optional: Hinzufügen von Hover-Effekten */
+.btn-toggle:hover {
+  opacity: 0.9; /* Leichte Transparenz beim Hovern */
+}
+/* Basis-Styles für die Details-Ansicht */
+.details-container {
+  padding: 10px;
+  margin-top: 10px;
+  border-top: 1px solid #ccc;
+}
+
+/* Stil für Überschriften innerhalb der Details */
+.details-container h3 {
+  margin-top: 3px;
+  margin-bottom: 2px;
+  color: #333;
+  font-size: 1.2em;
+}
+
+/* Stil für Paragraphen innerhalb der Details */
+.details-container p {
+  margin: 2px 0;
+  font-size: 1em;
+  color: #666;
+}
+
+/* Spezifische Styles für Palettendaten */
+.palettendaten-container {
+  margin-top: 20px;
+  background: #f9f9f9;
+  border: 1px solid #eaeaea;
+  border-radius: 2px;
+  padding: 10px;
+}
+
+.palettendaten-container p {
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Stil für Trennlinien innerhalb der Palettendaten */
+.palettendaten-container hr {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+/* Stil für die Auflistung von Palettendaten-Details */
+.palettendaten-detail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.palettendaten-detail div {
+  flex-basis: 30%; /* Passt die Breite jedes Detail-Blocks an */
+  margin-bottom: 10px;
+}

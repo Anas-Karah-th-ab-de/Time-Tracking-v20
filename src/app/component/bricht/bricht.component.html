@@ -1,0 +1,35 @@
+<!-- bericht-komponente.component.html -->
+
+<div class="bericht-komponente">
+
+    <!-- Dropdown-Menü zur Auswahl des Berichtstyps -->
+    <select [(ngModel)]="selectedBerichtTyp" (change)="onBerichtTypChange()">
+        <option value="tagesbericht">Tagesbericht</option>
+        <option value="wochenbericht">Wochenbericht</option>
+        <option value="monatsbericht">Monatsbericht</option>
+        <option value="mitarbeiterbericht">Mitarbeiterbericht</option>
+        <!-- Weitere Optionen hier hinzufügen -->
+    </select>
+
+    <!-- Dynamische Anzeige basierend auf dem ausgewählten Berichtstyp -->
+    <div *ngIf="selectedBerichtTyp === 'tagesbericht'">
+        <!-- Komponente/Template für Tagesbericht -->
+    </div>
+
+    <div *ngIf="selectedBerichtTyp === 'wochenbericht'">
+        <!-- Komponente/Template für Wochenbericht -->
+    </div>
+
+    <div *ngIf="selectedBerichtTyp === 'monatsbericht'">
+        <!-- Komponente/Template für Monatsbericht -->
+    </div>
+
+    <div *ngIf="selectedBerichtTyp === 'mitarbeiterbericht'">
+        <!-- Komponente/Template für Mitarbeiterbericht -->
+    </div>
+
+    <!-- Weitere Bedingungen für andere Berichtstypen -->
+
+    <!-- Download-Button -->
+    <button (click)="downloadBericht()">Bericht herunterladen</button>
+</div>

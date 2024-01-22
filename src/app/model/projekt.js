@@ -20,7 +20,8 @@ const palettenDatenSchema = new mongoose.Schema({
       musterKunde: Number,
       musterPP: Number,
       gesamtmenge: Number,
-      ausschuss: Number
+      ausschuss: Number,
+      sumAusschusse:Number
     }
   });
   const zeitIntervallSchema = new mongoose.Schema({

@@ -8,7 +8,8 @@ import { DetailComponent } from './component/projektleiter/detail/detail.compone
 import { MitarbeiterDetailComponent } from './component/mitarbeiter-detail/mitarbeiter-detail.component';
 import { MitarbeiterErstellenComponent } from './component/mitarbeiter-erstellen/mitarbeiter-erstellen.component';
 import { MitarbeiterListeComponent } from './component/mitarbeiter-liste/mitarbeiter-liste.component';
-
+import { TagesberichtComponent } from './component/bricht/tagesbericht/tagesbericht.component';
+import { BrichtComponent } from './component/bricht/bricht.component';
 import { NaviComponent } from './component/navi/navi.component';
 
 const routes: Routes = [
@@ -23,10 +24,12 @@ const routes: Routes = [
   { path: 'mitarbeiter-liste', component: MitarbeiterListeComponent },
   { path: 'mitarbeiter-detail', component: MitarbeiterDetailComponent },
   { path: 'mitarbeiter-erstellen', component: MitarbeiterErstellenComponent },
+  {path:'tagsbricht', component:TagesberichtComponent},
+  {path:'bricht', component:BrichtComponent},
   {
     path: 'navi',
     component: NaviComponent,
-   // canActivate: [AuthGuard, LicenseGuard, RightsGuard],
+
     data: { requiredRight: 'navi' } ,
     children: [
       { path: 'mitarbeiter-liste', component: MitarbeiterListeComponent },
