@@ -25,7 +25,7 @@ Time-TrackMeister ist eine umfassende Time-Tracking-Anwendung, die es Teams und 
 8. **Benutzerfreundliches Design:** Eine klare und intuitive Benutzeroberfläche ermöglicht es neuen Nutzern, ohne umfangreiche Einarbeitung mit der Anwendung zu arbeiten.
 
 **Sicherheit und Compliance:
-Time-TrackMeister gewährleistet höchste Sicherheitsstandards für Firmen interne Nutzung , um vertrauliche Informationen zu schützen und Compliance-Anforderungen zu erfüllen.
+Time-TrackMeister gewährleistet Sicherheitsstandards für Firmen interne Nutzung.
 
 **Anwendungsbereiche:**
 - Projektbasierte Organisationen
