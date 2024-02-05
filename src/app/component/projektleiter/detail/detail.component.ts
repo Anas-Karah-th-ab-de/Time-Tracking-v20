@@ -8,6 +8,9 @@ import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
+import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
+import { HttpHeaders } from '@angular/common/http';
+
 interface RecognizedMitarbeiter {
   _id: string;
   name: string;
@@ -20,7 +23,11 @@ interface RecognizedMitarbeiter {
 export class DetailComponent implements OnInit{
 // In Ihrer DetailsComponent-Klasse
 
-
+readonly httpOptions = {
+  headers: new HttpHeaders({
+    'PrestigePromotion': 'MA-Ak-KM-Idlib-+963-023'
+  })
+};
 aktuellesProjekt: any;
 letzteProjekt: any;
   mitarbeiterDatenMap = new Map<string, any>();
@@ -52,34 +59,40 @@ letzteProjekt: any;
       const produktionslinie = params['produktionslinie'];
       const auftrag = params['auftrag'];
       const datum = params['datum'];
-      console.log(produktionslinie, auftrag, datum);
+      this.userRole= params['rolle']
+
   
       // Abrufen des Projekts vom Server
-      this.http.get('http://kmapp.prestigepromotion.de:3002/projekt', { params: { produktionslinie, auftrag, datum } })
-        .subscribe(projekt => {
+      this.http.get('http://kmapp.prestigepromotion.de:3002/projekt', { 
+        params: { produktionslinie, auftrag, datum },
+        headers: this.httpOptions.headers // Übernehmen der Header aus httpOptions
+      }).subscribe(projekt => {
+          console.log(projekt)
           this.aktuellesProjekt = projekt;
-          console.log(projekt);
+          //console.log(projekt);
          
             this.mitarbeiterDaten = this.aktuellesProjekt.mitarbeiter;
-            console.log('werwer',this.mitarbeiterDaten);
+           // console.log('werwer',this.mitarbeiterDaten);
+           if (this.aktuellesProjekt && this.aktuellesProjekt.palettenDaten) {
             this.formVollePaletten = this.aktuellesProjekt.palettenDaten.vollePaletten;
-            this.formRestPaletten = this.aktuellesProjekt.palettenDaten.restPaletten;
+            this.formRestPalettenListe = this.aktuellesProjekt.palettenDaten.restPaletten;
             this.formGesamt = this.aktuellesProjekt.palettenDaten.gesamtDaten;
-          
+        }
+        
         });
   
-      this.http.get('http://kmapp.prestigepromotion.de:3002/api/vorletztes-nicht-aktives-projekt', { params: { produktionslinie, auftrag } })
-        .subscribe(projekt => {
+        this.http.get('http://kmapp.prestigepromotion.de:3002/api/vorletztes-nicht-aktives-projekt', { 
+          params: { produktionslinie, auftrag },
+          headers: this.httpOptions.headers // Übernehmen der Header aus httpOptions
+      }).subscribe(projekt => {
           this.letzteProjekt = projekt;
-  
-          
-            this.letzteformVollePaletten = this.letzteProjekt.palettenDaten.vollePaletten;
-            this.letzteformRestPaletten = this.letzteProjekt.palettenDaten.restPaletten;
-            this.letzteformGesamt = this.letzteProjekt.palettenDaten.gesamtDaten;
-          
-  
-          console.log(projekt);
-        });
+      
+          // Use optional chaining to safely access properties
+          this.letzteformVollePaletten = this.letzteProjekt?.palettenDaten?.vollePaletten;
+          this.letzteformRestPaletten = this.letzteProjekt?.palettenDaten?.restPaletten;
+          this.letzteformGesamt = this.letzteProjekt?.palettenDaten?.gesamtDaten;
+      });
+      
     });
   }
   
@@ -104,8 +117,10 @@ letzteProjekt: any;
 
 
   formVollePaletten = { paletten: 0, kartons: 0, stueckKarton: 0, gesamtmenge: 0 };
-  formRestPaletten = { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 };
-  formGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 ,sumAusschusse:0};
+  formRestPalettenListe: any[] = [
+    { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 }
+  ];
+  formGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 ,sumAusschusse:0 ,produzierteStueckzahl:0};
   letzteformVollePaletten = { paletten: 0, kartons: 0, stueckKarton: 0, gesamtmenge: 0 };
   letzteformRestPaletten = { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 };
   letzteformGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 ,sumAusschusse:0};
@@ -119,6 +134,10 @@ letzteProjekt: any;
     ausschuss: false, // Ausschuss bestätigen
     gesamtDaten: false 
   };  
+
+  addRestPalette(): void {
+    this.formRestPalettenListe.push({ paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 });
+  }
   // ...
   resetFormFields() {
     
@@ -130,10 +149,12 @@ letzteProjekt: any;
     });
   
     // Reset für formRestPaletten
-    Object.keys(this.formRestPaletten).forEach(key => {
-      if ((this.formRestPaletten as any)[key] === 0) {
-        (this.formRestPaletten as any)[key] = '';
-      }
+    this.formRestPalettenListe.forEach(restPalette => {
+      Object.keys(restPalette).forEach(key => {
+        if (restPalette[key] === 0) {
+          restPalette[key] = '';
+        }
+      });
     });
   
     // Reset für formGesamt
@@ -151,71 +172,116 @@ letzteProjekt: any;
   sumAusschusse !:number;
   aktualisiereBerechnungen() {
     this.Gesamtstueckzahlmitarbeiter = this.mitarbeiterDaten.reduce((sum, current) => sum + current.stueckanzahl, 0);
-    this.Menge1vollePalette=this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton;
-   
-    this.formGesamt.gesamtmenge = this.Gesamtstueckzahlmitarbeiter + this.gesamtDatenltzete;
-    this.formVollePaletten.paletten = Math.ceil(this.formGesamt.gesamtmenge/ this.Menge1vollePalette) ;
-
-    this.formVollePaletten.gesamtmenge = this.formVollePaletten.paletten *  this.Menge1vollePalette ;
-   
-  	this.formRestPaletten.gesamtmenge= this.formGesamt.gesamtmenge%this.Menge1vollePalette;
-  	if (this.formRestPaletten.gesamtmenge > 0) {
-  	  this.formRestPaletten.paletten = 1;
-  	} else {
-  	  this.formRestPaletten.paletten = 0; // Assuming Feld6 is another property you want to set
-  	}
-  	this.formRestPaletten.stueckKarton =this.formVollePaletten.stueckKarton;
-  	this.formRestPaletten.stueckRestkarton =this.formRestPaletten.gesamtmenge % this.formVollePaletten.stueckKarton;
-
-  	this.formRestPaletten.kartons= (this.formRestPaletten.gesamtmenge- this.formRestPaletten.stueckRestkarton)/this.formVollePaletten.stueckKarton;
-
-    this.formGesamt.liefermenge=   this.formGesamt.gesamtmenge - (this.formGesamt.musterKunde + this.formGesamt.musterPP);
-    console.log( this.formGesamt.liefermenge)
-    console.log(this.formGesamt.musterKunde + this.formGesamt.musterPP)
-    // Berechnung der Gesamtmenge unter Berücksichtigung des Ausschusses
-
+  
+    // Berechnung für volle Paletten
+    this.Menge1vollePalette = this.formVollePaletten.kartons * this.formVollePaletten.stueckKarton;
+    this.formVollePaletten.gesamtmenge = this.formVollePaletten.paletten * this.Menge1vollePalette;
+  
+    // Berechnungen für jede Restpalette
+    this.formRestPalettenListe.forEach(restPalette => {
+      restPalette.gesamtmenge = (restPalette.paletten * (restPalette.kartons - 1) * restPalette.stueckKarton) + restPalette.stueckRestkarton;
+    });
+  
+    // Berechnung der neuen Gesamtmenge
+    this.formGesamt.gesamtmenge = this.formGesamt.produzierteStueckzahl + this.gesamtDatenltzete;
     this.formGesamt.sumAusschusse=this.letzteformGesamt.ausschuss+this.formGesamt.ausschuss;
+    // Berechnung der Liefermenge
+    this.formGesamt.liefermenge = this.formGesamt.gesamtmenge - this.formGesamt.musterKunde - this.formGesamt.musterPP - (this.formGesamt.sumAusschusse );
+  
+    // Logging für Debugging-Zwecke
+    //console.log("Liefermenge:", this.formGesamt.liefermenge);
   }
   
   bestaetigenUndSpeichern(): void {
-    const projektDaten = {
-      // ... Sammeln Sie alle relevanten Daten aus dem Formular ...
-      palettenDaten: {
-        vollePaletten: this.formVollePaletten,
-        restPaletten: this.formRestPaletten,
-        gesamtDaten: this.formGesamt
-      },
-      mitarbeiter: this.mitarbeiterDaten // Angenommen, dies ist korrekt formatiert
-    };
-  
-    this.updateProject(this.aktuellesProjekt._id, projektDaten).subscribe(
-      response => {
-        console.log('Projekt erfolgreich aktualisiert', response);
-        // Weiterer Code nach erfolgreichem Update
-        this.router.navigate(['/projektleiter']);
-      },
-      error => {
-        console.error('Fehler beim Aktualisieren des Projekts', error);
-        // Fehlerbehandlung
-      }
-    );
+    console.log('start');
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '600px',
+      data: { message: 'Sind Sie sicher, dass Sie speichern möchten?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+            console.log(result);
+            // Corrected the condition to check if version is neither null nor 0
+            if (this.aktuellesProjekt.version !== null && this.aktuellesProjekt.version !== 0) {
+                const validierungsFehler = this.validateFormData();
+                if (validierungsFehler) {
+                    console.error(validierungsFehler); // Log the error
+                    alert(validierungsFehler); // Display the error in an alert dialog
+                    console.log('projektDaten');
+                    return; // Exit the method if there is a validation error
+                }
+            } else {
+                // Your code to proceed without validation because version is null or 0
+                const projektDaten = {
+                    // Collect all relevant form data...
+                    palettenDaten: {
+                        vollePaletten: this.formVollePaletten,
+                        restPaletten: this.formRestPalettenListe,
+                        gesamtDaten: this.formGesamt
+                    },
+                    mitarbeiter: this.mitarbeiterDaten // Assuming this is correctly formatted
+                };
+
+                this.updateProject(this.aktuellesProjekt._id, projektDaten).subscribe(
+                    response => {
+                        console.log('Projekt erfolgreich aktualisiert', response);
+                        this.navigateBasedOnCondition();
+                    },
+                    error => {
+                        console.error('Fehler beim Aktualisieren des Projekts', error);
+                    }
+                );
+            }
+        }
+    });
+}
+
+  userRole!:string;
+  navigateBasedOnCondition() {
+    // Beispielbedingung: Rolle des Benutzers ist 'Projektleiter'
+    const userRole =  this.userRole; // Dies sollte dynamisch aus Ihrem Authentifizierungsservice oder Benutzerkontext abgerufen werden
+    console.log(this.userRole)
+    if (userRole === 'Projektleiter') {
+      this.router.navigate(['/projektleiter']);
+    } else if (userRole === 'Tablet') { // Beispiel für eine weitere Bedingung
+      this.router.navigate(['/tablet']);
+    }
   }
   
 // Angular Service-Methode zum Aktualisieren eines Projekts
 updateProject(projektId: string, projektDaten: any): Observable<any> {
-  return this.http.put(`http://kmapp.prestigepromotion.de:3002/projekt/${projektId}`, projektDaten);
+  return this.http.put(`http://kmapp.prestigepromotion.de:3002/projekt/${projektId}`, projektDaten, this.httpOptions);
 }
 
-  validateFormData() {
-    // Validierung der Formulardaten vor dem Senden
-    // Beispiel: Überprüfung, ob alle notwendigen Felder ausgefüllt sind
-    if (!this.formVollePaletten.paletten || !this.formRestPaletten.paletten || !this.formGesamt.liefermenge) {
-      console.error('Einige erforderliche Formulardaten fehlen');
-      return false;
-    }
-    // Weitere Validierungen können hier hinzugefügt werden
-    return true;
+validateFormData(): string | null {
+  // Überprüfung der vollen Paletten
+  if (!this.formVollePaletten.paletten || !this.formGesamt.liefermenge) {
+    return 'Einige erforderliche Daten für volle Paletten fehlen.';
   }
+
+  // Überprüfung jeder Restpalette
+
+
+  // Berechnung der Gesamtstückzahl der Mitarbeiter
+  const gesamtStueckzahlMitarbeiter = this.mitarbeiterDaten.reduce((sum, current) => sum + current.stueckanzahl, 0);
+
+  // Überprüfung, ob die Summe der Stückzahlen der MA gleich der produzierten Menge ist
+  if (gesamtStueckzahlMitarbeiter !== this.formGesamt.produzierteStueckzahl) {
+    return 'Die Summe der Stückzahlen der Mitarbeiter entspricht nicht der produzierten Menge.';
+  }
+
+  // Berechnung der Gesamtstückzahl aller Paletten
+  const gesamtStueckzahlPaletten = this.formVollePaletten.gesamtmenge + this.formRestPalettenListe.reduce((sum, palette) => sum + palette.gesamtmenge, 0);
+
+  // Überprüfung, ob die Summe der Stückzahlen aller Paletten gleich der Liefermenge ist
+  if (gesamtStueckzahlPaletten !== this.formGesamt.liefermenge) {
+    return 'Die Summe der Stückzahlen aller Paletten entspricht nicht der Liefermenge.';
+  }
+
+  return null; // Kein Fehler gefunden
+}
+
   
 
 

@@ -1,0 +1,22 @@
+.gif-container {
+    position: fixed; /* Oder 'absolute', je nach Bedarf */
+    bottom: 20px; /* Abstand vom unteren Rand */
+    right: 20px; /* Abstand vom rechten Rand */
+    z-index: 1000; /* Stellen Sie sicher, dass es über anderen Elementen angezeigt wird */
+    background-color: rgba(255, 255, 255, 0.9); /* Leicht transparenter Hintergrund für bessere Lesbarkeit */
+    padding: 10px; /* Innenabstand um das GIF und den Link */
+    border-radius: 8px; /* Abgerundete Ecken */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Schatten für einen schwebenden Effekt */
+    display: flex; /* Flexbox-Layout für bessere Positionierung der Kinder */
+    flex-direction: column; /* Elemente vertikal anordnen */
+    align-items: center; /* Zentriert die Elemente horizontal */
+    justify-content: center; /* Zentriert die Elemente vertikal */
+    text-align: center; /* Zentriert den Text */
+  }
+  
+  .gif-container img {
+    width: 100px; /* oder z.B. width: 10%; je nach gewünschter Größe */
+    height: auto; /* Dies stellt sicher, dass das Bild seine Proportionen beibehält */
+    margin-bottom: 10px; /* Abstand zwischen dem Bild und dem Link */
+  }
+  

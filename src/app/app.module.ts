@@ -22,7 +22,6 @@ import { ProjektleiterAbfrageComponent } from './component/produktionslinien/pro
 import { PersonalschleuseComponent } from './component/personalschleuse/personalschleuse.component';
 import { ProjektleiterComponent } from './component/projektleiter/projektleiter.component';
 import { DetailComponent } from './component/projektleiter/detail/detail.component';
-import { NaviComponent } from './component/navi/navi.component';
 import { MitarbeiterListeComponent } from './component/mitarbeiter-liste/mitarbeiter-liste.component';
 import { MitarbeiterErstellenComponent } from './component/mitarbeiter-erstellen/mitarbeiter-erstellen.component';
 import { MitarbeiterDetailComponent } from './component/mitarbeiter-detail/mitarbeiter-detail.component';
@@ -30,7 +29,9 @@ import { QrCodeDialogComponent } from './component/qr-code-dialog/qr-code-dialog
 import { BrichtComponent } from './component/bricht/bricht.component';
 import { TagesberichtComponent } from './component/bricht/tagesbericht/tagesbericht.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { GrafikComponent } from './component/Bricht/tagesbericht/grafik/grafik.component';
+import { AlteprojekteComponent } from './component/projektleiter/alteprojekte/alteprojekte.component';
+import { ConfirmationDialogComponent } from './component/projektleiter/detail/confirmation-dialog/confirmation-dialog.component';
+import { TabeletComponent } from './component/projektleiter/tabelet/tabelet.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -41,14 +42,17 @@ import { GrafikComponent } from './component/Bricht/tagesbericht/grafik/grafik.c
     PersonalschleuseComponent,
     ProjektleiterComponent,
     DetailComponent,
-    NaviComponent,
+ 
     MitarbeiterListeComponent,
     MitarbeiterErstellenComponent,
     MitarbeiterDetailComponent,
     QrCodeDialogComponent,
     BrichtComponent,
     TagesberichtComponent,
-    GrafikComponent
+
+    AlteprojekteComponent,
+    ConfirmationDialogComponent,
+    TabeletComponent
   ],
   imports: [
     ReactiveFormsModule,

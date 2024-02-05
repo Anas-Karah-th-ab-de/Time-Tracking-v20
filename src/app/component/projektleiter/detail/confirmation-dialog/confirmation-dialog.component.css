@@ -1,0 +1,37 @@
+/* Style for the dialog actions container */
+mat-dialog-title {
+    color: #333; /* Dark grey color for the title */
+    font-size: 2.5rem; /* Slightly larger font size */
+    margin-bottom: 0.5rem; /* Space below the title */
+  }
+  
+  /* Style for the dialog content */
+  mat-dialog-content {
+    color: #131212; /* Lighter grey for the content */
+    font-size: 10rem; /* Regular font size for the content */
+  }
+  
+mat-dialog-actions {
+    display: flex;
+    justify-content: space-between; /* This will push the children to the extreme ends */
+    width: 100%; /* Ensures the container takes full width */
+  }
+  
+  /* Specific style for the left-aligned button (cancel) */
+   mat-dialog-action.a button[mat-dialog-close]:first-of-type {
+    background-color: #f44336; /* Red background for cancel button */
+    color: white; /* White text color */
+    margin-right: auto; /* Pushes all other items to the opposite end */
+    border: none;
+    padding: 10px 20px; /* Adjust padding as needed */
+    border-radius: 4px; /* Rounded corners */
+  }
+  
+  /* Specific style for the right-aligned button (confirm) */
+  mat-dialog-actions.a button[mat-dialog-close]:last-of-type {
+    background-color: #4CAF50; /* Green background for confirm button */
+    color: white; /* White text color */
+    border: none;
+    padding: 10px 20px; /* Adjust padding as needed */
+    border-radius: 4px; /* Rounded corners */
+  }

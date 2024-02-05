@@ -56,34 +56,81 @@ export class TagesberichtComponent implements OnInit {
   
   
   constructor(private http: HttpClient, private formBuilder: FormBuilder) {
+  
     const heute = new Date();
     const aktuellesDatum = formatDate(heute, 'yyyy-MM-dd', 'en');
 
     this.datumForm = this.formBuilder.group({
       startDatum: [aktuellesDatum],
       endDatum: [aktuellesDatum],
-      aktivStatus: [false]
+      aktivStatus: [false],
+      atossZeit: [0]
     });
+    
   }
+  private handleRightClick2Bound = this.handleRightClick2.bind(this);
 
+
+  vergleichsErgebnis: string = '';
+
+  // ... Ihre bestehenden Methoden ...
+
+  private vergleicheAtossZeit(): void {
+    const eingegebeneAttosZeit = this.datumForm.value.attosZeit;
+    if (eingegebeneAttosZeit > this.gesamtDauerAllerAuftraege) {
+      this.vergleichsErgebnis = 'Attos Zeit ist größer als die gesamte Dauer aller Aufträge.';
+    } else if (eingegebeneAttosZeit < this.gesamtDauerAllerAuftraege) {
+      this.vergleichsErgebnis = 'Attos Zeit ist kleiner als die gesamte Dauer aller Aufträge.';
+    } else {
+      this.vergleichsErgebnis = 'Attos Zeit entspricht der gesamten Dauer aller Aufträge.';
+    }
+  }
   ngOnInit(): void {
     this.datenAbrufen();
     const canvas = document.getElementById('meineGrafik');
     if (canvas) {
       canvas.addEventListener('contextmenu', this.handleRightClick.bind(this));
     }
-  
-    this.erstelleGrafik();
+    const canvas2 = document.getElementById('gesammelteDatenGrafik');
+  if (canvas2) {
+    canvas2.addEventListener('contextmenu', this.handleRightClick2Bound);
   }
+    this.erstelleGrafik();
+    const atossZeitControl = this.datumForm.get('atossZeit');
+    if (atossZeitControl) {
+      atossZeitControl.valueChanges.subscribe((value) => {
+        if (value !== null && value !== '') {
+          this.zeigeVergleichInGrafik();
+        }
+      });
+    }
+  
+    // Initialisieren Sie das Diagramm
+    this.erstelleGesammelteDatenGrafik();
+    
+  }
+  
   handleRightClick(event: MouseEvent): void {
     event.preventDefault(); // Verhindert das Standard-Kontextmenü
     this.erstelleGrafik(); // Erstellt die Hauptgrafik neu
+  }
+  private handleRightClick2(event: MouseEvent): void {
+    event.preventDefault(); // Verhindern des Standard-Kontextmenüs
+    this.zeigeVergleichInGrafik(); // Aufruf der Vergleichsfunktion
   }
   ngOnDestroy() {
     const canvas = document.getElementById('meineGrafik');
     if (canvas) {
       canvas.removeEventListener('contextmenu', this.handleRightClick.bind(this));
     }
+   // Überprüfen Sie, ob die Variable definiert ist, bevor Sie sie verwenden
+   const canvas2 = document.getElementById('gesammelteDatenGrafik');
+   if (canvas2) {
+     canvas2.removeEventListener('contextmenu', this.handleRightClick2Bound);
+   }
+   
+    
+    
   }
   
   datenAbrufen(): void {
@@ -100,6 +147,7 @@ export class TagesberichtComponent implements OnInit {
         this.berechneGesamtDatenProAuftrag();
         this.erstelleGrafik();
         this.erstelleGesammelteDatenGrafik();
+        this.vergleicheAtossZeit();
         // Verarbeiten Sie hier die empfangenen Daten
       }, error => {
         console.error('Fehler beim Abrufen der Daten:', error);
@@ -319,10 +367,56 @@ export class TagesberichtComponent implements OnInit {
           y: {
             beginAtZero: true
           }
+        },
+        onClick: () => {
+          this.zeigeVergleichInGrafik();
         }
       }
     });
   }
+  public  zeigeVergleichInGrafik() {
+    
+    const atossZeit = this.datumForm.value.atossZeit;
+    if (atossZeit != null) {
+    const gesamtDauer = this.gesamtDauerAllerAuftraege;
+    const differenz = atossZeit - gesamtDauer;
+    const abweichung = differenz / gesamtDauer * 100; // Prozentuale Abweichung
+  
+    // Überprüfen Sie, ob das Chart-Objekt nicht null ist
+    if (this.gesammelteDatenChart) {
+      // Erstellen Sie individuelle Datasets für jeden Vergleichswert
+      this.gesammelteDatenChart.data.datasets = [
+        {
+          label: 'Atoss Zeit',
+          data: [atossZeit],
+          backgroundColor: 'rgba(255, 206, 86, 0.5)'
+        },
+        {
+          label: 'Gesamtdauer aller Aufträge',
+          data: [gesamtDauer],
+          backgroundColor: 'rgba(54, 162, 235, 0.5)'
+        },
+        {
+          label: 'Differenz',
+          data: [differenz],
+          backgroundColor: 'rgba(75, 192, 192, 0.5)'
+        },
+        {
+          label: 'Abweichung (%)',
+          data: [abweichung],
+          backgroundColor: 'rgba(255, 99, 132, 0.5)'
+        }
+      ];
+  
+      // Sie müssen die Labels so setzen, dass sie den Datasets entsprechen
+      this.gesammelteDatenChart.data.labels = ['Vergleichswerte'];
+  
+      // Aktualisieren Sie das Diagramm, um die Änderungen anzuzeigen
+      this.gesammelteDatenChart.update();
+    }}
+  }
+  
+  
   downloadAsPDF() {
     const element = document.querySelector(".tabelle-und-grafik") as HTMLElement; // Typumwandlung zu HTMLElement
 

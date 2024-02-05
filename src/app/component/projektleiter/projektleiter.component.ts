@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
+import { HttpHeaders } from '@angular/common/http';
+
 @Component({
   selector: 'app-projektleiter',
   templateUrl: './projektleiter.component.html',
@@ -12,7 +14,8 @@ import { Router } from '@angular/router';
 export class ProjektleiterComponent implements OnInit {
   projekte: any[] = [];
   gefilterteProjekte: any[] = [];
-  filterText: string = '';
+  auftrag: string = '';
+  produktionsline: string = '';
   ausgewaehltesProjekt: any = null;
   private baseUrl = 'http://kmapp.prestigepromotion.de:3002';
   aktuellesDatum: string;
@@ -21,8 +24,13 @@ export class ProjektleiterComponent implements OnInit {
     this.aktuellesDatum = heute.toISOString().split('T')[0]; // Format: 'YYYY-MM-DD'
   }
   projektleiter!:string;
+  readonly httpOptions = {
+    headers: new HttpHeaders({
+      'PrestigePromotion': 'MA-Ak-KM-Idlib-+963-023'
+    })
+  };
   getNichtAktiveProjekte(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/projekte/nichtAktiv`);
+    return this.http.get(`${this.baseUrl}/projekte/nichtAktiv`,this.httpOptions);
   }
   ngOnInit(): void {
     // Holen Sie den projektleiter-Wert aus der Route
@@ -59,28 +67,34 @@ export class ProjektleiterComponent implements OnInit {
     // Pfad zur Detailkomponente, z. B. '/projektdetails'
     const detailPath = '/projektdetails';
   
+    // Rolle direkt als 'Tablet' zuweisen
+    const userRole = 'Projektleiter';
+  
     // Parameter für die Navigation
     const navigationExtras = {
       queryParams: {
         produktionslinie: this.ausgewaehltesProjekt.produktionslinie,
         auftrag: this.ausgewaehltesProjekt.Auftrag,
-        datum: this.ausgewaehltesProjekt.startzeit // oder ein anderes relevantes Datum
+        datum: this.ausgewaehltesProjekt.startzeit, // oder ein anderes relevantes Datum
+        rolle: userRole // Rolle direkt in die Query-Parameter einfügen
       }
     };
-  
+  console.log(navigationExtras)
     // Navigieren zur Detailkomponente mit den Parametern
     this.router.navigate([detailPath], navigationExtras);
   }
+  
   mitarbeiterFilter: string =  '';
   filterByAuftrag(projekt: any): boolean {
-    if (!this.filterText) return true;
-    return projekt.Auftrag.toLowerCase().includes(this.filterText.toLowerCase());
+    if (!this.auftrag) return true;
+    return projekt.Auftrag.toLowerCase().includes(this.auftrag.toLowerCase());
   }
 
   filterByProduktionslinie(projekt: any): boolean {
-    if (!this.filterText) return true;
-    return projekt.produktionslinie.toLowerCase().includes(this.filterText.toLowerCase());
+    if (!this.produktionsline) return true;
+    return projekt.produktionslinie.toLowerCase().includes(this.produktionsline.toLowerCase());
   }
+
 
 
 
@@ -102,7 +116,7 @@ export class ProjektleiterComponent implements OnInit {
   
   applyFilter(): void {
     this.gefilterteProjekte = this.projekte.filter(projekt => 
-      (this.filterByAuftrag(projekt) ||
+      (this.filterByAuftrag(projekt) &&
       this.filterByProduktionslinie(projekt)) &&
       this.filterByMitarbeiter(projekt) &&
       this.filterByDatum(projekt)

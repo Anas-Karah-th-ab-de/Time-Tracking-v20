@@ -10,36 +10,26 @@ import { MitarbeiterErstellenComponent } from './component/mitarbeiter-erstellen
 import { MitarbeiterListeComponent } from './component/mitarbeiter-liste/mitarbeiter-liste.component';
 import { TagesberichtComponent } from './component/bricht/tagesbericht/tagesbericht.component';
 import { BrichtComponent } from './component/bricht/bricht.component';
-import { NaviComponent } from './component/navi/navi.component';
 
+import { AlteprojekteComponent } from './component/projektleiter/alteprojekte/alteprojekte.component';
+import { TabeletComponent } from './component/projektleiter/tabelet/tabelet.component';
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'tablet', component: TabeletComponent },
   { path: 'login', component: LoginComponent },
   // Aktualisierte Route mit Parameter
   { path: 'produktionslinien/:linie', component: ProduktionslinienComponent },
   { path: 'personalschleuse', component: PersonalschleuseComponent },
   { path: 'projektleiter', component: ProjektleiterComponent },
+  { path: 'alt', component: AlteprojekteComponent },
   { path: 'projektleiter/:projektleiter', component: ProjektleiterComponent },
   { path: 'projektdetails', component: DetailComponent },
   { path: 'mitarbeiter-liste', component: MitarbeiterListeComponent },
   { path: 'mitarbeiter-detail', component: MitarbeiterDetailComponent },
   { path: 'mitarbeiter-erstellen', component: MitarbeiterErstellenComponent },
-  {path:'tagsbricht', component:TagesberichtComponent},
-  {path:'bricht', component:BrichtComponent},
-  {
-    path: 'navi',
-    component: NaviComponent,
+  //{path:'tagsbricht', component:TagesberichtComponent},
 
-    data: { requiredRight: 'navi' } ,
-    children: [
-      { path: 'mitarbeiter-liste', component: MitarbeiterListeComponent },
-      { path: 'mitarbeiter-detail', component: MitarbeiterDetailComponent },
-      { path: 'mitarbeiter-erstellen', component: MitarbeiterErstellenComponent },
-      { path: 'projektleiter', component: ProjektleiterComponent }
-    
-     
-    ]
-  }
+  
 ];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

@@ -1,10 +1,26 @@
 <!-- in Ihrer Komponenten-Template-Datei -->
-<div class="input-container">
-<input type="text" #inputField [(ngModel)]="inputValue" (input)="handleInputChange(inputValue)">
 
-<div *ngIf="feedbackMessage">{{ feedbackMessage }}</div>
+<!-- Vorherige Inhalte ... -->
 
+<!-- Schicht-Buttons -->
+<div class="schicht-button-container" *ngIf="!schichtAusgewaehlt">
+  <button (click)="waehleSchicht('Frühschicht')">Frühschicht</button>
+  <button (click)="waehleSchicht('Tagschicht')">Tagschicht</button>
+  <button (click)="waehleSchicht('Spätschicht')">Spätschicht</button>
 </div>
+
+<!-- Anzeige der ausgewählten Schicht -->
+
+
+
+<!-- Rest des Templates ... -->
+
+
+<div class="input-container">
+  <input type="text" #inputField [(ngModel)]="inputValue" (input)="handleInputChange(inputValue)">
+  <div *ngIf="feedbackMessage">{{ feedbackMessage }}</div>
+</div>
+
 
 
 
@@ -19,12 +35,13 @@
 <div class="projekt-daten">
     <h3>Projektdaten:</h3>
       <p><span class="label">Produktionslinie:</span><span class="value">{{ produktionslinienDaten }}</span></p>
+      <p *ngIf="schichtAusgewaehlt"><span class="label">Aktuelle Schicht::</span><span class="value">{{ aktuelleSchicht }}</span></p>
       <p><span class="label">PP-Auftrag-Nr.:</span><span class="value">{{ PpArfrag }}</span></p>
       <p><span class="label">Produkt:</span><span class="value">{{ Bezeichnung }}</span></p>
       <p><span class="label">Menge:</span><span class="value">{{ sollmenge }}</span></p>
       
      
-      
+ 
         
       <p><span class="label">Startzeit:</span><span class="value">{{ formatierteProjektStartzeit  }}</span></p>
       <p><span class="label">Aktiv seit:</span><span class="value">{{ aktivSeit }}</span></p>

@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
-
+const restPalettenSchema = new mongoose.Schema({
+  paletten: Number,
+  kartons: Number,
+  stueckKarton: Number,
+  stueckRestkarton: Number,
+  gesamtmenge: Number
+});
 const palettenDatenSchema = new mongoose.Schema({
     vollePaletten: {
       paletten: Number,
@@ -8,13 +14,7 @@ const palettenDatenSchema = new mongoose.Schema({
       stueckKarton: Number,
       gesamtmenge: Number
     },
-    restPaletten: {
-      paletten: Number,
-      kartons: Number,
-      stueckKarton: Number,
-      stueckRestkarton: Number,
-      gesamtmenge: Number
-    },
+    restPaletten: [restPalettenSchema], 
     gesamtDaten: {
       liefermenge: Number,
       musterKunde: Number,
@@ -45,7 +45,10 @@ const palettenDatenSchema = new mongoose.Schema({
   
 const projektSchema = new mongoose.Schema({
 
-
+  bilanzierungBestaetigt: {
+    type: Boolean,
+    default: false
+  },
   Auftrag: {
     type: String,
 
@@ -55,6 +58,10 @@ const projektSchema = new mongoose.Schema({
    
   },
   produktionslinie: {
+    type: String,
+
+  },
+  arbeitsschicht: {
     type: String,
 
   },
@@ -73,6 +80,10 @@ const projektSchema = new mongoose.Schema({
   },
   palettenDaten: palettenDatenSchema,
   auftragszeit: Number,
+  version: {
+    type: Number,
+    default: 0
+  },
 });
 
 const Projekt = mongoose.model('Projekt', projektSchema);

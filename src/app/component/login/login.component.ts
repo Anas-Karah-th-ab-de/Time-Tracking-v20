@@ -4,13 +4,19 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { DataSharingService } from '../../service/data-sharing.service';
+import { HttpHeaders } from '@angular/common/http';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-
+  readonly httpOptions = {
+    headers: new HttpHeaders({
+      'PrestigePromotion': 'MA-Ak-KM-Idlib-+963-023'
+    })
+  };
   userInput!: string;
   userInputSubject = new Subject<string>();
 
@@ -29,7 +35,7 @@ export class LoginComponent {
   }
 
   login() {
-    this.http.post<LoginResponse>('http://kmapp.prestigepromotion.de:3002/login', { username: this.userInput })
+    this.http.post<LoginResponse>('http://kmapp.prestigepromotion.de:3002/login', { username: this.userInput },this.httpOptions)
       .subscribe(response => {
         console.log(response);
         // Überprüfen Sie, ob das user-Objekt vorhanden ist
@@ -38,6 +44,7 @@ export class LoginComponent {
         }
       });
   }
+  
   redirectUser(username: string) {
     if (username.startsWith('PL.')) {
       this.dataSharingService.setProduktionslinienDaten(username);

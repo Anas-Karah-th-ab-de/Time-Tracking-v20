@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { interval } from 'rxjs';
+import { HttpHeaders } from '@angular/common/http';
+
 @Component({
   selector: 'app-personalschleuse',
   templateUrl: './personalschleuse.component.html',
@@ -28,7 +30,11 @@ export class PersonalschleuseComponent implements OnInit {
     });
   });
 }
-
+readonly httpOptions = {
+  headers: new HttpHeaders({
+    'PrestigePromotion': 'MA-Ak-KM-Idlib-+963-023'
+  })
+};
   ngOnInit() {
     this.setFocusOnInput();
     this.qrCodeInputSubject.pipe(
@@ -65,7 +71,7 @@ export class PersonalschleuseComponent implements OnInit {
       const mitarbeiterName = nameTeil[1].trim();
       console.log(mitarbeiterName);
       // Senden der Anfrage an das Backend
-      this.http.post<any>('http://kmapp.prestigepromotion.de:3002/api/abmeldung', { mitarbeiterName }).subscribe(response => {
+      this.http.post<any>('http://kmapp.prestigepromotion.de:3002/api/abmeldung', { mitarbeiterName },this.httpOptions).subscribe(response => {
         // Verarbeiten der Antwort
         this.abgemeldeterMitarbeiter = response.mitarbeiterName;
         this.abmeldezeit = new Date(response.abmeldezeit);

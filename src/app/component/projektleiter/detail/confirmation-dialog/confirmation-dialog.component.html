@@ -1,0 +1,20 @@
+<h2 mat-dialog-title style="    color: #333; /* Dark grey color for the title */
+font-size: 2rem; /* Slightly larger font size */
+margin-bottom: 0.5rem; /* Space below the title */">Bestätigung</h2>
+<mat-dialog-content style="color: #131212; /* Lighter grey for the content */
+font-size: 1.5rem; /* Regular font size for the content */">
+  <p>{{ data.message }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end" class="a">
+  <button mat-button mat-dialog-close style="background-color: #f44336; /* Red background for cancel button */
+  color: white; /* White text color */
+  margin-right: auto; /* Pushes all other items to the opposite end */
+  border: none;
+  padding: 10px 20px; /* Adjust padding as needed */
+  border-radius: 4px; /* Rounded corners */">Abbrechen</button>
+  <button mat-button [mat-dialog-close]="true" style=" background-color: #4CAF50; /* Green background for confirm button */
+  color: white; /* White text color */
+  border: none;
+  padding: 10px 20px; /* Adjust padding as needed */
+  border-radius: 4px; /* Rounded corners */">Bestätigen</button>
+</mat-dialog-actions>

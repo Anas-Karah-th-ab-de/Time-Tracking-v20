@@ -1,5 +1,6 @@
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { Component, ElementRef, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { HttpClient, HttpParams,HttpHeaders } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { DataSharingService } from '../../service/data-sharing.service';
@@ -46,9 +47,15 @@ interface Mitarbeiter {
   templateUrl: './produktionslinien.component.html',
   styleUrls: ['./produktionslinien.component.css']
 })
-export class ProduktionslinienComponent implements AfterViewInit {
+export class ProduktionslinienComponent implements OnInit, OnDestroy, AfterViewInit {
+  ngOnInit(): void {
+   
+    this.intervalId = setInterval(() => {
+      this.aktualisiereSeite();
+    }, 30000); // 300000 ms = 5 Minuten
+  }
   @ViewChild('inputField') inputField!: ElementRef;
-  
+  schichtAusgewaehlt = false;
   projektStartzeit: Date | null = null; // Startzeit des Projekts             // Speichert die Startzeit des Projekts
   aktivSeit: string = '';              // Speichert die Dauer, wie lange das Projekt aktiv ist
   aktiveMitarbeiter: Mitarbeiter[] = [];
@@ -62,6 +69,11 @@ export class ProduktionslinienComponent implements AfterViewInit {
       debounceTime(1000)  // 1000 Millisekunden Wartezeit
     ).subscribe(inputValue => {
       this.sendData(inputValue);
+    });
+    this.inputSubject.pipe(
+      debounceTime(2000) // Verzögerung von 2000 Millisekunden
+    ).subscribe(value => {
+      this.performAction(value);
     });
   }
   istProduktionszeit: boolean = true;
@@ -98,6 +110,19 @@ export class ProduktionslinienComponent implements AfterViewInit {
       this.wechselStatus();
     }
   }
+  performAction(value: string) {
+    //console.log("Aktion ausführen mit Wert:", value);
+    // Setzen einer Feedback-Nachricht
+    this.feedbackMessage = `Suche nach: ${value}`;
+  
+    // Setzen eines Timers, um die Nachricht nach 2 Sekunden zu löschen
+    setTimeout(() => {
+      this.feedbackMessage = ''; // Löscht die Nachricht nach 2000 Millisekunden
+      // Sorgen Sie hier für die Aktualisierung der Ansicht, falls nötig, z.B. durch die Verwendung von ChangeDetectorRef in Angular
+      this.cdr.detectChanges(); // Nur nötig, wenn die Änderung nicht automatisch erkannt wird
+    }, 2000);
+  }
+  
 
   wechselStatus() {
     // Logik zum Wechseln des Status
@@ -136,33 +161,58 @@ export class ProduktionslinienComponent implements AfterViewInit {
     
   
   }
-
+  readonly httpOptions = {
+    headers: new HttpHeaders({
+      'PrestigePromotion': 'MA-Ak-KM-Idlib-+963-023'
+    })
+  };
   sd(){
     this.aktiveMitarbeiter.forEach(mitarbeiter => {
-      // Update the status locally
-//console.log(this.produktionslinienDaten)
-      // Send request to backend to update the status
-      this.http.put(`http://kmapp.prestigepromotion.de:3002/aktualisiereStatus/${this.produktionslinienDaten}`, {
+
+      this.http.put(`http://kmapp.prestigepromotion.de:3002/aktualisiereStatus/${this.produktionslinienDaten}`,{
         mitarbeiterName: mitarbeiter.name,
         neueAktivitaet: mitarbeiter.status
-      }).subscribe({
-        next: (response) => console.log(response),
+      },this.httpOptions ).subscribe({
+        
         error: (error) => console.error('Fehler beim Aktualisieren des Mitarbeiterstatus:', error)
       });
     });
   }
   produktionslinienDaten!: string;
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.produktionslinienDaten = this.route.snapshot.paramMap.get('linie') || 'defaultWert';
-    
-    this.ladeAktivesProjekt();
-    //this.produktionslinienDaten = this.dataSharingService.getProduktionslinienDaten();
- 
+    this.ladeAktivesProjekt(); 
     this.initFocusOnInputField();
     this.cdr.detectChanges();
-    setInterval(() => this.updateDateTime(), 1000);
-    //setInterval(() =>  this.ladeAktivesProjekt(), 6000);
- 
+
+    // Aktualisierung der Uhrzeit jede Sekunde
+    this.updateIntervalId = setInterval(() => this.updateDateTime(), 1000);
+    // Lade aktives Projekt alle 6 Sekunden
+   
+
+    // Prüfung auf Samstag
+    Promise.resolve().then(() => {
+      const today = new Date();
+      if (today.getDay() === 6) {
+        this.schichtAusgewaehlt = true;
+      }
+    });
+  }
+  private intervalId: any;
+
+  private updateIntervalId: any;
+  private aktivesProjektIntervalId: any;
+  ngOnDestroy(): void {
+    // Bereinigen der Intervalle
+    if (this.updateIntervalId) {
+      clearInterval(this.updateIntervalId);
+    }
+    if (this.aktivesProjektIntervalId) {
+      clearInterval(this.aktivesProjektIntervalId);
+    }
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   }
   initFocusOnInputField() {
     this.focusListener = this.renderer.listen('window', 'click', () => {
@@ -170,12 +220,15 @@ export class ProduktionslinienComponent implements AfterViewInit {
     });
   }
   private ladeAktivesProjekt() {
-    this.http.get<any>(`http://kmapp.prestigepromotion.de:3002/aktives-projekt/${this.produktionslinienDaten}`).subscribe(projekt => {
+    this.http.get<any>(`http://kmapp.prestigepromotion.de:3002/aktives-projekt/${this.produktionslinienDaten}`,this.httpOptions ).subscribe(projekt => {
       if (projekt) {
         this.PpArfrag = projekt.Auftrag;
-        this.Bezeichnung = 'Produktbezeichnung'; // Fügen Sie Logik hinzu, um diese Daten zu erhalten
-        this.sollmenge = 'Menge'; // Fügen Sie Logik hinzu, um diese Daten zu erhalten
+        this.Bezeichnung = 'Produktbezeichnung'; 
+        this.sollmenge = 'Menge'; 
+        this.aktuelleSchicht=projekt.arbeitsschicht
         this.aktiveMitarbeiter = projekt.mitarbeiter.map((mitarbeiter: Mitarbeiter) => {
+         // console.log(projekt)
+          if(projekt.arbeitsschicht=="Frühschicht"||projekt.arbeitsschicht=="Spätschicht"||projekt.arbeitsschicht=="Tagschicht"||projekt.arbeitsschicht=="Samstagschicht" ){this.schichtAusgewaehlt = true;}else{this.schichtAusgewaehlt = false;}
           return {
             ...mitarbeiter,
             status: this.bestimmeAktuellenStatus(mitarbeiter)
@@ -235,10 +288,11 @@ export class ProduktionslinienComponent implements AfterViewInit {
     this.currentDate = now.toLocaleDateString();
     this.currentTime = now.toLocaleTimeString();
   }
-
+  private inputSubject = new Subject<string>();
   handleInputChange(inputValue: string) {
     this.inputValue = inputValue;
     this.inputChanged.next(inputValue);
+    this.inputSubject.next(inputValue);
   }
 currentProjektId!: string;
 Mitarbeiter: Mitarbeiter[] = [];
@@ -345,11 +399,11 @@ private prüfeAktivenAuftrag(daten: DataToSend) {
 }
 
 private sendRequest(daten: DataToSend) {
-  this.http.post('http://kmapp.prestigepromotion.de:3002/data', daten)
+  this.http.post('http://kmapp.prestigepromotion.de:3002/data', daten ,this.httpOptions)
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);
-        //this.aktualisiereSeite();
+        this.aktualisiereSeite();
       },
       error: (error) => {
         this.handleFehlerAntwort(error);
@@ -357,16 +411,14 @@ private sendRequest(daten: DataToSend) {
     });
 }
 private aktualisiereSeite() {
-  window.location.reload(); // Standardmethode zum Neuladen der Seite
-  // Alternativ können Sie hier auch eine andere Logik einfügen, 
-  // um bestimmte Teile der Seite zu aktualisieren, anstatt die ganze Seite neu zu laden.
+  this.ladeAktivesProjekt(); 
 }
 private neueauftrag(daten: DataToSend) {
-  this.http.post(`http://kmapp.prestigepromotion.de:3002/neuerAuftragMitarbeiter/${this.produktionslinienDaten}`,daten)
+  this.http.post(`http://kmapp.prestigepromotion.de:3002/neuerAuftragMitarbeiter/${this.produktionslinienDaten}`,daten,this.httpOptions)
     .subscribe({
       next: (response: any) => {
         this.handleErfolgreicheAntwort(response, daten);
-        //this.aktualisiereSeite();
+        this.aktualisiereSeite();
       },
       error: (error) => {
         this.handleFehlerAntwort(error);
@@ -397,64 +449,47 @@ private resetInput() {
 }
 
 
-  private sendRequestToBackend(mitarbeiterName: string) {
-    // URL des Endpunkts mit Einbeziehung der produktionslinienDaten
-    const url = `http://kmapp.prestigepromotion.de:3002/checkMitarbeiter/${this.produktionslinienDaten}`;
+private sendRequestToBackend(mitarbeiterName: string): Observable<any> {
+  // URL des Endpunkts mit Einbeziehung der produktionslinienDaten
+  const url = `http://kmapp.prestigepromotion.de:3002/checkMitarbeiter/${this.produktionslinienDaten}`;
 
-    // Daten, die im Body der Anfrage gesendet werden
-    const dataToSend = {
-        mitarbeiterName: mitarbeiterName,
-        status :this.status
-    };
+  // Daten, die im Body der Anfrage gesendet werden
+  const dataToSend = {
+    mitarbeiterName: mitarbeiterName,
+    status: this.status
+  };
 
-    // Senden einer POST-Anfrage an das Backend
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataToSend)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Netzwerkantwort war nicht ok');
-        }
-        return response.json();
-
-    })
-    .then(data => {
-        console.log('Erfolgreich gesendet:', data);
-    })
-    .catch(error => {
-        console.error('Fehler beim Senden der Daten:', error);
-    });
+  // Senden einer POST-Anfrage an das Backend
+  return this.http.post(url, dataToSend, this.httpOptions)
+   
 }
 
 
-  async checkAktiverAuftrag(daten: DataToSend): Promise<any> {
-    //console.log(daten)
-    try {
-      const url = 'http://kmapp.prestigepromotion.de:3002/check-aktiver-auftrag';
-  
-      let params = new HttpParams();
-      if (daten.produktionslinie) {
-        params = params.set('produktionslinie', daten.produktionslinie);
-      }
-      if (daten.Auftrag) {
-        params = params.set('Auftrag', daten.inputValue);
-       // console.log(params)
-      }
-  
-      // Beachten Sie, dass der Typ hier nicht mehr `boolean` ist, sondern `any` oder ein spezifischer Typ, der Ihrer Antwortstruktur entspricht
-      const response = await this.http.get<any>(url, { params }).toPromise();
-      //console.log('checkAktiverAuftrag',response)
-      return response;
-    } catch (error) {
-      console.error('Fehler beim Überprüfen des aktiven Auftrags:', error);
-      return { existiertAktiverAuftrag: false };
+async checkAktiverAuftrag(daten: any): Promise<any> {
+  try {
+    const url = 'http://kmapp.prestigepromotion.de:3002/check-aktiver-auftrag';
+
+    let params = new HttpParams();
+    if (daten.produktionslinie) {
+      params = params.set('produktionslinie', daten.produktionslinie);
     }
+    if (daten.Auftrag) {
+      params = params.set('Auftrag', daten.inputValue);
+    }
+
+    // Erweitern der httpOptions, um die params einzuschließen
+    const options = {
+      ...this.httpOptions,
+      params: params
+    };
+
+    const response = await this.http.get<any>(url, options).toPromise();
+    return response;
+  } catch (error) {
+    console.error('Fehler beim Überprüfen des aktiven Auftrags:', error);
+    return { existiertAktiverAuftrag: false };
   }
-  
+}
 
   
   
@@ -463,7 +498,7 @@ private resetInput() {
   sollmenge!:string;
   PpArfrag!:string;
   private scanAuftrag(auftragsnummer: string) {
-    this.http.get<any>(`http://kmapp.prestigepromotion.de:3002/auftrag-details/${auftragsnummer}`)
+    this.http.get<any>(`http://kmapp.prestigepromotion.de:3002/auftrag-details/${auftragsnummer}`,this.httpOptions)
       .subscribe({
         next: (response) => {
           this.PpArfrag=response.auftragsDetails.auftragsnr;
@@ -480,5 +515,40 @@ private resetInput() {
       });
       this.cdr.detectChanges();
   }
+
+
+
+
+
+  aktualisiereSchicht(produktionslinienDaten: string, schicht: string) {
+    return this.http.patch(`http://kmapp.prestigepromotion.de:3002/projekt/${produktionslinienDaten}/schicht`, { arbeitsschicht: schicht },this.httpOptions);
+  }
+  
+
+  aktuelleSchicht: string = ''; // Variable zum Speichern der aktuellen Schicht
+
+  // ... bestehende Methoden und Logik...
+
+  waehleSchicht(schicht: string) {
+    const bestaetigung = confirm(`${schicht} einstellen?`); // Bestätigungsdialog
+    if (bestaetigung) {
+      this.aktualisiereSchicht(this.produktionslinienDaten, schicht)
+        .subscribe({
+          next: (response) => {
+            //console.log('Schicht erfolgreich aktualisiert', response);
+            this.schichtAusgewaehlt = true;
+            this.aktuelleSchicht = schicht; // Aktuelle Schicht speichern
+          },
+          error: (error) => {
+            console.error('Fehler beim Aktualisieren der Schicht', error);
+            this.schichtAusgewaehlt = false;
+          }
+        });
+    }
+  }
+  
+
+
+
   
 }

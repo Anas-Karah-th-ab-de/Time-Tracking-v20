@@ -192,10 +192,48 @@ button:hover {
   margin-left: 10px;
   cursor: pointer;
 }
-/* Anpassungen für die Projekt-Daten und Mitarbeiter-Liste */
+.schicht-button-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto; /* Center the container if it's not as wide as the viewport */
+}
 
-/* Rest des CSS unverändert... */
+.schicht-button-container button {
+  flex-grow: 1;
+  margin: 0 15px; /* Increase margin to add space between buttons */
+  padding: 40px 0; /* Increase padding to make buttons taller */
+  font-size: 20px; /* Increase font size to make text larger */
+  border: none;
+  border-radius: 5px; /* Optional: add rounded corners */
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s; /* Smooth transition for button press effect */
+}
+/* Adjust the first and last child to have no margin at the beginning and end */
+.schicht-button-container button:first-child {
+  margin-left: 0;
+  margin-right: 10px;
+}
 
+.schicht-button-container button:last-child {
+  margin-left: 10px;
+  margin-right: 0;
+}
 
+.schicht-button-container button:nth-child(1) {
+  background-color: #3498db; /* Blue for the first button */
+}
 
-/* Weitere vorhandene Stile... */
+.schicht-button-container button:nth-child(2) {
+  background-color: #2ecc71; /* Green for the second button */
+}
+
+.schicht-button-container button:nth-child(3) {
+  background-color: #e74c3c; /* Red for the third button */
+}
+
+.schicht-button-container button:hover {
+  opacity: 0.8; /* Slight transparency on hover for visual feedback */
+}

@@ -1,5 +1,13 @@
 <!-- login.component.html -->
+
 <form (submit)="login()">
+  <div class="header">
+    
+  
+    <img src="assets/Download.png" alt="Logo" class="logo" />
+  
+  
+  </div>
     <label>Bitte scannen Sie den QR-Code</label>
     <input type="text" [(ngModel)]="userInput" (ngModelChange)="onUserInputChanged($event)" [ngModelOptions]="{standalone: true}">
 

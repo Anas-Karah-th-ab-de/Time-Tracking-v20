@@ -17,9 +17,13 @@
         Aktivstatus
       </label>
     <!--  <button type="button" (click)="toggleAnsicht()" [ngClass]="{'zusammenfassen': datenZusammengefasst, 'btn-toggle': true}" class="btn-toggle">{{ ansichtButtonLabel }}</button>-->
+
     
     </div>
-  
+    <div class="form-group">
+      <label for="atossZeit">ATOSS Zeit (in Minuten):</label>
+      <input type="number" formControlName="atossZeit" (change)="zeigeVergleichInGrafik()">
+    </div>
     <button type="submit" class="btn">Daten abrufen</button>
   </form>
   
