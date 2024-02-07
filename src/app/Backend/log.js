@@ -19,7 +19,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 
-mongoose.connect('mongodb://kmapp.prestigepromotion.de:27017/time-tracking')
+mongoose.connect('mongodb:/-/time-tracking')
   .then(() => console.log('MongoDB verbunden...'))
   .catch(err => console.error('MongoDB Verbindungsfehler:', err));
   const auftragDbConnection = mongoose.createConnection('mongodb://kmapp.prestigepromotion.de:27017/auftragDB', );
