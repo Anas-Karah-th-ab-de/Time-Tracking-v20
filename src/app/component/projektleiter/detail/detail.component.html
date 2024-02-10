@@ -13,11 +13,11 @@
 
   <div class="daten-sektion">
     <h3>Rest Paletten</h3>
-    <div class="daten-grid">
-      <div><strong>Paletten:</strong> <span>{{ letzteformRestPaletten.paletten }}</span></div>
-      <div><strong>Kartons:</strong> <span>{{ letzteformRestPaletten.kartons }}</span></div>
-      <div><strong>Stück pro Restkarton:</strong> <span>{{ letzteformRestPaletten.stueckRestkarton }}</span></div>
-      <div><strong>Stückzahl gesamt:</strong> <span>{{ letzteformRestPaletten.gesamtmenge }}</span></div>
+    <div class="daten-grid" *ngFor="let restPalette of letzteformRestPalettenListe; let i = index">
+      <div><strong>Paletten:</strong> <span>{{ restPalette.paletten }}</span></div>
+      <div><strong>Kartons:</strong> <span>{{ restPalette.kartons }}</span></div>
+      <div><strong>Stück pro Restkarton:</strong> <span>{{ restPalette.stueckRestkarton }}</span></div>
+      <div><strong>Stückzahl gesamt:</strong> <span>{{ restPalette.gesamtmenge }}</span></div>
     </div>
   </div>
 
@@ -30,6 +30,7 @@
       <div><strong>Gesamtmenge:</strong> <span>{{ letzteformGesamt.gesamtmenge }}</span></div>
       <div><strong>Ausschuss:</strong> <span>{{ letzteformGesamt.ausschuss }}</span></div>
       <div><strong>Sume der Ausschuss:</strong> <span>{{ letzteformGesamt.sumAusschusse }}</span></div>
+      <div><strong>Produzierte Stückzahl:</strong> <span>{{ letzteformGesamt.produzierteStueckzahl }}</span></div>
     </div>
   </div>
 </div>

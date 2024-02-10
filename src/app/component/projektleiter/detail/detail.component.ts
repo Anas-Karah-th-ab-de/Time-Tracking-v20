@@ -52,19 +52,19 @@ letzteProjekt: any;
   isMitarbeiterQrScanned = false;
   mitarbeiterProduktionsschritte: { [mitarbeiterName: string]: string } = {};
   produktionslinieEingegeben = false;
-
+  startzeit!:string;
   // Ihre weiteren Eigenschaften und Methoden...
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const produktionslinie = params['produktionslinie'];
       const auftrag = params['auftrag'];
       const datum = params['datum'];
-      this.userRole= params['rolle']
+      this.userRole= params['rolle']; 
 
-  
+      const startzeit = datum
       // Abrufen des Projekts vom Server
       this.http.get('http://kmapp.prestigepromotion.de:3002/projekt', { 
-        params: { produktionslinie, auftrag, datum },
+        params: { produktionslinie, auftrag,startzeit },
         headers: this.httpOptions.headers // Übernehmen der Header aus httpOptions
       }).subscribe(projekt => {
           console.log(projekt)
@@ -77,22 +77,30 @@ letzteProjekt: any;
             this.formVollePaletten = this.aktuellesProjekt.palettenDaten.vollePaletten;
             this.formRestPalettenListe = this.aktuellesProjekt.palettenDaten.restPaletten;
             this.formGesamt = this.aktuellesProjekt.palettenDaten.gesamtDaten;
+           this.aktualisiereBerechnungen();
         }
         
         });
-  
-        this.http.get('http://kmapp.prestigepromotion.de:3002/api/vorletztes-nicht-aktives-projekt', { 
-          params: { produktionslinie, auftrag },
-          headers: this.httpOptions.headers // Übernehmen der Header aus httpOptions
-      }).subscribe(projekt => {
-          this.letzteProjekt = projekt;
-      
-          // Use optional chaining to safely access properties
-          this.letzteformVollePaletten = this.letzteProjekt?.palettenDaten?.vollePaletten;
-          this.letzteformRestPaletten = this.letzteProjekt?.palettenDaten?.restPaletten;
-          this.letzteformGesamt = this.letzteProjekt?.palettenDaten?.gesamtDaten;
-      });
-      
+     
+        
+       // Stellen Sie sicher, dass Sie die Schnittstellen `Projekt`, `PaletteDaten`, und `GesamtDaten` bereits definiert haben
+
+this.http.get<Projekt>('http://kmapp.prestigepromotion.de:3002/api/vorletztes-nicht-aktives-projekt', { 
+  params: { produktionslinie, auftrag, startzeit },
+  headers: this.httpOptions.headers
+}).subscribe(projekt => {
+  this.letzteProjekt=projekt
+  if (this.letzteProjekt&&this.letzteProjekt.palettenDaten) {
+    // Jetzt können Sie die Daten sicher zuweisen
+    this.letzteformVollePaletten = this.letzteProjekt.palettenDaten.vollePaletten ;
+    this.letzteformRestPalettenListe = this.letzteProjekt.palettenDaten.restPaletten;
+    this.letzteformGesamt = this.letzteProjekt.palettenDaten.gesamtDaten ;
+  } else {
+    console.log('Keine palettenDaten verfügbar');
+  }
+});
+
+     
     });
   }
   
@@ -122,8 +130,10 @@ letzteProjekt: any;
   ];
   formGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 ,sumAusschusse:0 ,produzierteStueckzahl:0};
   letzteformVollePaletten = { paletten: 0, kartons: 0, stueckKarton: 0, gesamtmenge: 0 };
-  letzteformRestPaletten = { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 };
-  letzteformGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 ,sumAusschusse:0};
+  letzteformRestPalettenListe: PaletteDaten[] = [
+    { paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 }
+  ];
+    letzteformGesamt = { liefermenge: 0, musterKunde: 0, musterPP: 0, gesamtmenge: 0, ausschuss: 0 ,sumAusschusse:0,produzierteStueckzahl:0};
 
   vollePalettenBestaetigt = { paletten: false, kartons: false, stueckKarton: false };
   restPalettenBestaetigt = { paletten: false, kartons: false, stueckKarton: false, stueckRestkarton: false };
@@ -137,6 +147,9 @@ letzteProjekt: any;
 
   addRestPalette(): void {
     this.formRestPalettenListe.push({ paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 });
+  }
+  addRestPaletteletzte(): void {
+    this.letzteformRestPalettenListe.push({ paletten: 0, kartons: 0, stueckKarton: 0, stueckRestkarton: 0, gesamtmenge: 0 });
   }
   // ...
   resetFormFields() {
@@ -198,49 +211,59 @@ letzteProjekt: any;
       width: '600px',
       data: { message: 'Sind Sie sicher, dass Sie speichern möchten?' }
     });
-
+  
     dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-            console.log(result);
-            // Corrected the condition to check if version is neither null nor 0
-            if (this.aktuellesProjekt.version !== null && this.aktuellesProjekt.version !== 0) {
-                const validierungsFehler = this.validateFormData();
-                if (validierungsFehler) {
-                    console.error(validierungsFehler); // Log the error
-                    alert(validierungsFehler); // Display the error in an alert dialog
-                    console.log('projektDaten');
-                    return; // Exit the method if there is a validation error
-                }
-            } else {
-                // Your code to proceed without validation because version is null or 0
-                const projektDaten = {
-                    // Collect all relevant form data...
-                    palettenDaten: {
-                        vollePaletten: this.formVollePaletten,
-                        restPaletten: this.formRestPalettenListe,
-                        gesamtDaten: this.formGesamt
-                    },
-                    mitarbeiter: this.mitarbeiterDaten // Assuming this is correctly formatted
-                };
-
-                this.updateProject(this.aktuellesProjekt._id, projektDaten).subscribe(
-                    response => {
-                        console.log('Projekt erfolgreich aktualisiert', response);
-                        this.navigateBasedOnCondition();
-                    },
-                    error => {
-                        console.error('Fehler beim Aktualisieren des Projekts', error);
-                    }
-                );
-            }
+      if (result) {
+        // Nur validieren, wenn das Dialog-Ergebnis positiv ist
+        if (this.valid()) {
+          this.save(); // Speichern aufrufen, wenn Validierung erfolgreich
         }
+      } else {
+        console.log('Speicherung abgebrochen.'); // Oder andere Logik für den Abbruch
+      }
     });
-}
-
+  }
+  
+  save(){
+    const projektDaten = {
+      // Collect all relevant form data...
+      palettenDaten: {
+          vollePaletten: this.formVollePaletten,
+          restPaletten: this.formRestPalettenListe,
+          gesamtDaten: this.formGesamt
+      },
+      mitarbeiter: this.mitarbeiterDaten // Assuming this is correctly formatted
+    };
+  
+    this.updateProject(this.aktuellesProjekt._id, projektDaten).subscribe(
+        response => {
+            console.log('Projekt erfolgreich aktualisiert', response);
+            this.navigateBasedOnCondition();
+        },
+        error => {
+            console.error('Fehler beim Aktualisieren des Projekts', error);
+        }
+    );
+    
+  }
+  
+  valid(){
+    if (this.aktuellesProjekt.version !== null && this.aktuellesProjekt.version !== 0) {
+        const validierungsFehler = this.validateFormData();
+        if (validierungsFehler) {
+            console.error(validierungsFehler); // Log the error
+            alert(validierungsFehler); // Display the error in an alert dialog
+            return false; // Indicate validation failed
+        }
+    }
+    return true; // Indicate validation succeeded
+  }
+  
   userRole!:string;
   navigateBasedOnCondition() {
     // Beispielbedingung: Rolle des Benutzers ist 'Projektleiter'
     const userRole =  this.userRole; // Dies sollte dynamisch aus Ihrem Authentifizierungsservice oder Benutzerkontext abgerufen werden
+    console.log(userRole)
     console.log(this.userRole)
     if (userRole === 'Projektleiter') {
       this.router.navigate(['/projektleiter']);
@@ -296,4 +319,28 @@ validateFormData(): string | null {
 
 
 }
+interface PaletteDaten {
+  paletten: number;
+  kartons: number;
+  stueckKarton: number;
+  gesamtmenge: number;
+  stueckRestkarton?: number; // Optional, nur für letzteformRestPaletten relevant
+}
 
+interface GesamtDaten {
+  liefermenge: number;
+  musterKunde: number;
+  musterPP: number;
+  gesamtmenge: number;
+  ausschuss: number;
+  sumAusschusse: number;
+}
+
+
+interface Projekt {
+  palettenDaten?: {
+    vollePaletten: PaletteDaten;
+    restPaletten: PaletteDaten;
+    gesamtDaten: GesamtDaten;
+  };
+}
