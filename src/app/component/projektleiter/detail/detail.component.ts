@@ -95,6 +95,7 @@ this.http.get<Projekt>('http://kmapp.prestigepromotion.de:3002/api/vorletztes-ni
     this.letzteformVollePaletten = this.letzteProjekt.palettenDaten.vollePaletten ;
     this.letzteformRestPalettenListe = this.letzteProjekt.palettenDaten.restPaletten;
     this.letzteformGesamt = this.letzteProjekt.palettenDaten.gesamtDaten ;
+    this.aktualisiereBerechnungen();
   } else {
     console.log('Keine palettenDaten verfügbar');
   }
@@ -192,11 +193,11 @@ this.http.get<Projekt>('http://kmapp.prestigepromotion.de:3002/api/vorletztes-ni
   
     // Berechnungen für jede Restpalette
     this.formRestPalettenListe.forEach(restPalette => {
-      restPalette.gesamtmenge = (restPalette.paletten * (restPalette.kartons - 1) * restPalette.stueckKarton) + restPalette.stueckRestkarton;
+      restPalette.gesamtmenge = (restPalette.paletten * (restPalette.kartons ) * restPalette.stueckKarton) + restPalette.stueckRestkarton;
     });
   
     // Berechnung der neuen Gesamtmenge
-    this.formGesamt.gesamtmenge = this.formGesamt.produzierteStueckzahl + this.gesamtDatenltzete;
+    this.formGesamt.gesamtmenge = this.formGesamt.produzierteStueckzahl +  this.letzteformGesamt.gesamtmenge;
     this.formGesamt.sumAusschusse=this.letzteformGesamt.ausschuss+this.formGesamt.ausschuss;
     // Berechnung der Liefermenge
     this.formGesamt.liefermenge = this.formGesamt.gesamtmenge - this.formGesamt.musterKunde - this.formGesamt.musterPP - (this.formGesamt.sumAusschusse );
@@ -206,7 +207,7 @@ this.http.get<Projekt>('http://kmapp.prestigepromotion.de:3002/api/vorletztes-ni
   }
   
   bestaetigenUndSpeichern(): void {
-    console.log('start');
+    //console.log('start');
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '600px',
       data: { message: 'Sind Sie sicher, dass Sie speichern möchten?' }

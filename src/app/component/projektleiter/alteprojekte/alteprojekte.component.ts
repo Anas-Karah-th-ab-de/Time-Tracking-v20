@@ -35,7 +35,7 @@ export class AlteprojekteComponent implements OnInit {
   ngOnInit(): void {
     // Holen Sie den projektleiter-Wert aus der Route
     this.projektleiter = this.route.snapshot.paramMap.get('projektleiter') || '';
-    console.log('Projektleiter:', this.projektleiter);
+   // console.log('Projektleiter:', this.projektleiter);
   
     // Setzen Sie den mitarbeiterFilter auf den Wert von projektleiter
     this.mitarbeiterFilter = this.projektleiter;
@@ -43,7 +43,7 @@ export class AlteprojekteComponent implements OnInit {
     // Laden Sie die Projekte und wenden Sie den Filter an
     this.getNichtAktiveProjekte().subscribe(
       data => {
-        console.log('Erhaltene Projekte:', data);
+     //   console.log('Erhaltene Projekte:', data);
   
         // Berechnen Sie das Datum von vor 5 Tagen
   
@@ -88,7 +88,7 @@ export class AlteprojekteComponent implements OnInit {
         rolle: userRole // Rolle direkt in die Query-Parameter einfügen
       }
     };
-  console.log(navigationExtras)
+ // console.log(navigationExtras)
     // Navigieren zur Detailkomponente mit den Parametern
     this.router.navigate([detailPath], navigationExtras);
   }
