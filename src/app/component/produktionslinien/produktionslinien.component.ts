@@ -11,6 +11,7 @@ import { OnInit, Renderer2 } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProjektleiterAbfrageComponent } from './projektleiter-abfrage/projektleiter-abfrage.component';
+import { Title } from '@angular/platform-browser';
 interface DataToSend {
   typ: string;
   inputValue: string;
@@ -64,14 +65,16 @@ export class ProduktionslinienComponent implements OnInit, OnDestroy, AfterViewI
   auftrag: string = '';
   private inputChanged = new Subject<string>();
   private focusListener: Function | null = null;
-  constructor(private route: ActivatedRoute,private cdr: ChangeDetectorRef, private renderer: Renderer2, public dialog: MatDialog, private http: HttpClient,private dataSharingService: DataSharingService) {
+  constructor(
+    private titleService: Title,
+    private route: ActivatedRoute,private cdr: ChangeDetectorRef, private renderer: Renderer2, public dialog: MatDialog, private http: HttpClient,private dataSharingService: DataSharingService) {
     this.inputChanged.pipe(
-      debounceTime(1000)  // 1000 Millisekunden Wartezeit
+      debounceTime(100)  // 1000 Millisekunden Wartezeit
     ).subscribe(inputValue => {
       this.sendData(inputValue);
     });
     this.inputSubject.pipe(
-      debounceTime(2000) // Verzögerung von 2000 Millisekunden
+      debounceTime(200) // Verzögerung von 2000 Millisekunden
     ).subscribe(value => {
       this.performAction(value);
     });
@@ -181,6 +184,8 @@ export class ProduktionslinienComponent implements OnInit, OnDestroy, AfterViewI
   produktionslinienDaten!: string;
   ngAfterViewInit(): void {
     this.produktionslinienDaten = this.route.snapshot.paramMap.get('linie') || 'defaultWert';
+    this.titleService.setTitle(`Einbuchen ${this.produktionslinienDaten}`);
+
     this.ladeAktivesProjekt(); 
     this.initFocusOnInputField();
     this.cdr.detectChanges();

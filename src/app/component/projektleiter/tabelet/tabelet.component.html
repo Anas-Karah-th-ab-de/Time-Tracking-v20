@@ -1,47 +1,88 @@
-<div class="navigation-buttons">
+<div>
+  <h1>Projekte ohne Bilanzierung</h1>
+  <div class="filter-container">
+    <mat-form-field appearance="fill" class="filter-field">
+      <mat-label>Filtern nach Auftrag</mat-label>
+      <input matInput type="text" [(ngModel)]="auftrag" (ngModelChange)="applyFilter()">
+    </mat-form-field>
 
+    <mat-form-field appearance="fill" class="filter-field">
+      <mat-label>Filtern nach Produktionslinie</mat-label>
+      <input matInput type="text" [(ngModel)]="produktionsline" (ngModelChange)="applyFilter()">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="filter-field">
+      <mat-label>Filtern nach Mitarbeitername</mat-label>
+      <input matInput type="text" [(ngModel)]="mitarbeiterFilter" (ngModelChange)="applyFilter()">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="filter-field">
+      <mat-label>Datum</mat-label>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="aktuellesDatum" (ngModelChange)="applyFilter()">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
   </div>
-  
-  <div>
-    <h1>Projekte ohne Bilanzierung</h1>
-    <div class="filter-container">
-      <input type="text" [(ngModel)]="auftrag" (ngModelChange)="applyFilter()" 
-             placeholder="Filtern nach Auftrag">
-             <input type="text" [(ngModel)]="produktionsline" (ngModelChange)="applyFilter()" 
-             placeholder="Filtern nach Produktionslinie">
-      <input type="text" [(ngModel)]="mitarbeiterFilter" (ngModelChange)="applyFilter()" 
-             placeholder="Filtern nach Mitarbeitername">
-      <input type="date" [(ngModel)]="aktuellesDatum" (ngModelChange)="applyFilter()">
-    </div>
+
+
     
+        <div>
+         
+          <mat-table [dataSource]="gefilterteProjekte" multiTemplateDataRows class="mat-elevation-z8">
+        
+            <!-- Auftrag Spalte -->
+            <ng-container matColumnDef="auftrag">
+              <mat-header-cell *matHeaderCellDef> Auftrag </mat-header-cell>
+              <mat-cell *matCellDef="let projekt" [style.backgroundColor]="projekt.Auftrag ? getFarbeFuerAuftrag(projekt.Auftrag) : defaultColor">
+                {{ projekt.Auftrag }}
+              </mat-cell>
+              
+                      </ng-container>
+        <!-- Fügen Sie diese Zeile in Ihre Tabelle Header ein -->
+      
+
+
+            <ng-container matColumnDef="kunde">
+              <mat-header-cell *matHeaderCellDef> Kunde </mat-header-cell>
+              <mat-cell *matCellDef="let projekt" >
+                {{ projekt.kunde }}
+              </mat-cell>
+            </ng-container>
+            <!-- Produktionslinie Spalte -->
+            <ng-container matColumnDef="produktionslinie">
+              <mat-header-cell *matHeaderCellDef> Produktionslinie </mat-header-cell>
+              <mat-cell *matCellDef="let projekt" [style.background-color]="getFarbeFuerLinie(projekt.produktionslinie)"> {{projekt.produktionslinie}} </mat-cell>
+            </ng-container>
+        
+            <!-- Startzeit Spalte -->
+            <ng-container matColumnDef="startzeit">
+              <mat-header-cell *matHeaderCellDef> Startzeit </mat-header-cell>
+              <mat-cell *matCellDef="let projekt"> {{projekt.startzeit | date:'dd.MM.yyyy HH:mm:ss'}} </mat-cell>
+            </ng-container>
+        
+            <!-- Endzeit Spalte -->
+            <ng-container matColumnDef="endzeit">
+              <mat-header-cell *matHeaderCellDef> Endzeit </mat-header-cell>
+              <mat-cell *matCellDef="let projekt"> {{projekt.endzeit | date:'dd.MM.yyyy HH:mm:ss'}} </mat-cell>
+            </ng-container>
+        <!-- Mitarbeiter Spalte -->
+            <ng-container matColumnDef="mitarbeiter">
+              <mat-header-cell *matHeaderCellDef> Mitarbeiter </mat-header-cell>
+              <mat-cell *matCellDef="let projekt"> {{ getMitarbeiterNamen(projekt) }} </mat-cell>
   
-  
-    <ul class="Projektdetails">
-    
-      <li *ngFor="let projekt of gefilterteProjekte" 
-          (click)="ausgewaehltesProjekt = ausgewaehltesProjekt === projekt ? null : projekt">
-          <div class="algemein">
-        <div>Auftrag: {{ projekt.Auftrag }}</div>
-        <div>Produktionslinie: {{ projekt.produktionslinie }}</div>
-        <div>Startzeit: {{ projekt.startzeit | date:'dd.MM.yyyy HH:mm:ss' }}</div>
-        <div>Endzeit: {{ projekt.endzeit | date:'dd.MM.yyyy HH:mm:ss' }}</div>
-  
-      </div>
-        <!-- Details direkt unter jedem Projekt anzeigen, wenn es ausgewählt ist -->
-        <div *ngIf="ausgewaehltesProjekt === projekt" class="details-container">
-          <h3>Projektdetails: {{ projekt.Auftrag }}</h3>
-          <div>
-            <h4>Mitarbeiter</h4>
-            <ul>
-              <li *ngFor="let mitarbeiter of projekt.mitarbeiter">
-                Name: {{ mitarbeiter.name }}
-                <!-- Weitere Mitarbeiterdetails -->
-              </li>
-            </ul>
-          </div>
-          <button (click)="onBearbeiten()">Bearbeiten</button>
+            </ng-container>
+            
+            <!-- Aktionen Spalte -->
+            <ng-container matColumnDef="aktionen">
+              <mat-header-cell *matHeaderCellDef> Aktionen </mat-header-cell>
+              <mat-cell *matCellDef="let projekt" [style.backgroundColor]="projekt.Auftrag ? getFarbeFuerAuftrag(projekt.Auftrag) : defaultColor">
+
+                                <button mat-button (click)="onBearbeiten(projekt, $event)">Bearbeiten</button>
+              </mat-cell>
+            </ng-container>
+            
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="toggleAusgewaehltesProjekt(row)"></mat-row>
+          </mat-table>
         </div>
-      </li>
-    </ul>
-  </div>
-  
+        

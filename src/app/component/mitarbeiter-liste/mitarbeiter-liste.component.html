@@ -21,7 +21,7 @@
       </ng-container>
     
       <ng-container matColumnDef="projektleiter">
-        <mat-header-cell *matHeaderCellDef> Projektleiter </mat-header-cell>
+        <mat-header-cell *matHeaderCellDef style="padding: 2px; ;"> Projektleiter </mat-header-cell>
         <mat-cell *matCellDef="let element"> {{element.projektleiter ? 'Ja' : 'Nein'}} </mat-cell>
       </ng-container>
     
@@ -30,7 +30,7 @@
         <mat-cell *matCellDef="let element">
           <button mat-button (click)="bearbeiten(element)">Bearbeiten</button>
           <button mat-button (click)="qrCodeAnzeigen(element)">QR-Code</button>
-          <button mat-button (click)="loeschen(element)">Löschen</button>
+          <button mat-button (click)="loeschen(element)" hidden>Löschen</button>
         </mat-cell>
       </ng-container>
     

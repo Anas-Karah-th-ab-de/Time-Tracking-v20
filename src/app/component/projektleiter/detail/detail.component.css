@@ -1,198 +1,140 @@
 /* Grundlegende Stildefinitionen */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f7ff;
-  margin: 0;
-  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f5f5;
   color: #333;
 }
 
-.projekt-container {
+.projekt-container, .paletteninfo {
+  max-width: 1200px;
+  margin: 20px auto;
   background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 40px;
-  padding: 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-h2, h3 {
-  color: #007bff;
-  margin-bottom: 25px;
-  font-weight: 700;
+.mat-card-title, h3 {
+  color: #1976d2;
 }
 
-/* Verbesserungen für .daten-sektion und .daten-grid */
-.daten-sektion {
-  margin-bottom: 20px; /* Fügt Abstand zwischen den Sektionen hinzu */
+.daten-sektion, section {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Letzter Abschnitt ohne untere Grenze */
+.daten-sektion:last-child, section:last-child {
+  border-bottom: none;
 }
 
 .daten-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px; /* Fügt Abstand zwischen den Elementen hinzu */
-}
-
-/* Stil für einzelne Elemente innerhalb von .daten-grid */
-.daten-grid div {
-  flex: 1;
-  min-width: 220px; /* Minimale Breite für jedes Element, um Umbrüche zu steuern */
-  background-color: #f7faff;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-strong {
-  color: #0056b3;
-}
-
-span {
-  color: #666;
-}
-
-/* Stil für Buttons und interaktive Elemente */
-button {
-  margin-top: 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.edit-mode-on, .edit-mode-off {
-  transition: background-color 0.3s;
-}
-
-.edit-mode-on {
-  background-color: #28a745;
-}
-
-.edit-mode-off {
-  background-color: #dc3545;
-}
-
-input[type="number"] {
-  padding: 10px;
-  border: 1px solid #bbcce0;
-  border-radius: 4px;
-  width: 100%;
-}
-
-input[type="number"]:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-  outline: none;
-}
-
-@media (max-width: 768px) {
-  .daten-grid {
-    flex-direction: column;
-  }
-
-  .daten-grid div {
-    min-width: auto; /* Erlaubt den Elementen, sich auf kleineren Bildschirmen anzupassen */
-  }
-}
-
-
-.daten-grid, .pallteninfo table {
+  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
 }
 
-/* Stile für Tabellen */
+.daten-grid div {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Stil für die Tabelle */
 table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fafafa;
-  border-radius: 8px;
-  overflow: hidden;
+  margin-top: 10px;
 }
 
 th, td {
   text-align: left;
-  padding: 12px;
+  padding: 8px;
   border-bottom: 1px solid #eee;
 }
 
 th {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-/* Responsives Design */
-@media (min-width: 768px) {
-  .daten-sektion {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .daten-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-  
-  .pallteninfo table {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-}
-
-/* Stile für Buttons */
-button {
-  background-color: #007bff;
+  background-color: #1976d2;
   color: white;
-  border: none;
+}
+
+/* Stil für Bearbeitungsmodus */
+.editMode {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Zentriert den Button horizontal */
+  align-items: center; /* Optional, falls Sie den Button auch vertikal zentrieren möchten */
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #eee;
+}
+
+.editMode button {
   padding: 10px 20px;
+  font-size: 16px;
   border-radius: 5px;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-}
-
-.edit-mode-on, .edit-mode-off {
   transition: background-color 0.3s ease;
 }
 
 .edit-mode-on {
-  background-color: #28a745; /* Grün */
+  background-color: #4CAF50; /* Grün */
+  color: white;
 }
 
 .edit-mode-off {
-  background-color: #dc3545; /* Rot */
+  background-color: #f44336; /* Rot */
+  color: white;
 }
 
-/* Zusätzliche Anpassungen für bessere Lesbarkeit */
-input[type="number"] {
-  padding: 8px;
+.editMode button:hover {
+  opacity: 0.9;
+}
+.editMode th, .editMode td {
+  margin: 5px 0; /* Vertikaler Abstand */
+  text-align: center; /* Zentriert den Text vertikal */
+}
+
+.editMode input[type="number"] {
+  width: auto; /* Automatische Breite basierend auf dem Inhalt */
+  padding: 6px 10px;
+  margin-top: 5px; /* Abstand oben */
+  font-size: 16px; /* Größere Schrift für bessere Lesbarkeit */
   border: 1px solid #ccc;
   border-radius: 4px;
+  text-align: center; /* Zentriert den eingegebenen Text */
+}
+input[type="number"] {
   width: 100%;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.2s ease-in-out;
+  padding: 6px 10px;
+  margin: 4px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
-input[type="number"]:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(0,123,255,.25);
+button {
+  background-color: #1976d2;
+  color: white;
+  padding: 10px 20px;
+  margin: 10px 0;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
-/* Verbesserungen für Überschriften */
-h2, h3 {
-  font-weight: 600;
+button:hover {
+  background-color: #b30000;
 }
 
-/* Feinabstimmung des responsiven Verhaltens */
-@media (max-width: 768px) {
-  .daten-grid div, .pallteninfo input[type="number"] {
-    padding-left: 0; /* Entfernt den linken Padding in mobiler Ansicht */
-  }
+.actions  {
+  display: grid;
+  background-color:#4CAF50;
+
+  text-align: center;
+  padding: 5px 10px; /* Erhöht den Padding für einen größeren Button */
+  font-size: 24px; /* Größere Schrift für den Text im Button */
+ 
 }
+

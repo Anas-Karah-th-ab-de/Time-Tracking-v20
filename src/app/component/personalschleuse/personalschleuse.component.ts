@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { interval } from 'rxjs';
 import { HttpHeaders } from '@angular/common/http';
-
+import { Title } from '@angular/platform-browser';
 @Component({
   selector: 'app-personalschleuse',
   templateUrl: './personalschleuse.component.html',
@@ -19,7 +19,7 @@ export class PersonalschleuseComponent implements OnInit {
   abmeldezeitde!: string;
   aktuelleZeit: string = '';
 
-  constructor(private http: HttpClient) { interval(500).subscribe(() => {
+  constructor(private titleService: Title,private http: HttpClient) { interval(500).subscribe(() => {
     this.aktuelleZeit = new Date().toLocaleString('de-DE', {
       year: 'numeric',
       month: '2-digit',
@@ -36,6 +36,7 @@ readonly httpOptions = {
   })
 };
   ngOnInit() {
+    this.titleService.setTitle('Ausbuchen');
     this.setFocusOnInput();
     this.qrCodeInputSubject.pipe(
       debounceTime(500) // Warten auf 1 Sekunde der Inaktivität

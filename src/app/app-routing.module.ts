@@ -15,14 +15,14 @@ import { AlteprojekteComponent } from './component/projektleiter/alteprojekte/al
 import { TabeletComponent } from './component/projektleiter/tabelet/tabelet.component';
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'tablet', component: TabeletComponent },
+  { path: 'Stundenzettel', component: TabeletComponent },
   { path: 'login', component: LoginComponent },
   // Aktualisierte Route mit Parameter
-  { path: 'produktionslinien/:linie', component: ProduktionslinienComponent },
-  { path: 'personalschleuse', component: PersonalschleuseComponent },
-  { path: 'projektleiter', component: ProjektleiterComponent },
+  { path: 'Einbuchen/:linie', component: ProduktionslinienComponent },
+  { path: 'Ausbuchen', component: PersonalschleuseComponent },
+  { path: 'fertige-Stundenzettel', component: ProjektleiterComponent },
   { path: 'alt', component: AlteprojekteComponent },
-  { path: 'projektleiter/:projektleiter', component: ProjektleiterComponent },
+  { path: 'fertige-Stundenzettel/:projektleiter', component: ProjektleiterComponent },
   { path: 'projektdetails', component: DetailComponent },
   { path: 'mitarbeiter-liste', component: MitarbeiterListeComponent },
   { path: 'mitarbeiter-detail', component: MitarbeiterDetailComponent },
